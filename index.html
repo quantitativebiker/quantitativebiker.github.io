@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Demo moving mesh method in WebGL</title>
+
+    
+    <script type="text/javascript" src="gl.js"></script>
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="movemesh.js"></script>
+    <script type="text/javascript" src="lines.js"></script>
+    <script type="text/javascript" src="meshcontrol.js"></script>
+    <script type="text/javascript" src="max.js"></script>
+    <script type="text/javascript" src="min.js"></script>
+
+    <script type="text/javascript" src="meshinitialiser.js"></script>
+
+    <script type="text/javascript" src="colors.js"></script>
+
+
+    <script type="text/javascript">
+        function preset1() {
+            document.getElementById('ufuncTextBox').value = "1.0/(1.0 + 1.0/(1.0 + 200.0*exp(- 200.0*((x-0.5*cos(t)) * (x-0.5*cos(t)) + ((y-0.5*sin(t)) * (y-0.5*sin(t)))) )) )";
+            document.getElementById("nXTextBox").value = "64";
+            document.getElementById("nYTextBox").value = "64";
+            document.getElementById("dtTextBox").value = "0.01";
+            document.getElementById("dtauTextBox").value = "1000.0";
+            document.getElementById("betaTextBox").value = "1.0";
+            document.getElementById("alphaTextBox").value = "0.0";
+            document.getElementById("jacobiIterationTextBox").value = "32";
+            funcShaderChange=true;
+            reset=true;
+        }
+
+        function preset2() {
+            document.getElementById('ufuncTextBox').value = "1.0 + 10.0*exp(-50.0 * abs(y - 0.25*sin(0.6*pi*x  + t*1.6) ) )";
+            document.getElementById("nXTextBox").value = "64";
+            document.getElementById("nYTextBox").value = "64";
+            document.getElementById("dtTextBox").value = "0.01";
+            document.getElementById("dtauTextBox").value = "1000.0";
+            document.getElementById("betaTextBox").value = "0.25";
+            document.getElementById("alphaTextBox").value = "0.0";
+            document.getElementById("jacobiIterationTextBox").value = "32";
+            funcShaderChange=true;
+            reset=true;
+        }
+
+        function preset3() {
+            document.getElementById('ufuncTextBox').value = "1.0 + 200.0*exp(- 200.0*( + (x-0.5*cos(t)) * (x-0.5*cos(t)) + ((y-0.5*sin(t)) * (y-0.5*sin(t)) ) ) ) + 200.0*exp(-100.0*(x*x+y*y) )";
+            document.getElementById("nXTextBox").value = "64";
+            document.getElementById("nYTextBox").value = "64";
+            document.getElementById("dtTextBox").value = "0.01";
+            document.getElementById("dtauTextBox").value = "1000.0";
+            document.getElementById("betaTextBox").value = "0.25";
+            document.getElementById("alphaTextBox").value = "0.0";
+            document.getElementById("jacobiIterationTextBox").value = "32";
+            funcShaderChange=true;
+            reset=true;
+        }
+
+        function preset4() {
+            document.getElementById('ufuncTextBox').value = "1.0/(1.0 + exp((x+y-sin(t) )/0.001))";
+            document.getElementById("nXTextBox").value = "64";
+            document.getElementById("nYTextBox").value = "64";
+            document.getElementById("dtTextBox").value = "0.005";
+            document.getElementById("dtauTextBox").value = "1000.0";
+            document.getElementById("betaTextBox").value = "0.25";
+            document.getElementById("alphaTextBox").value = "0.0";
+            document.getElementById("jacobiIterationTextBox").value = "32";
+            funcShaderChange=true;
+            reset=true;
+        }
+
+        function removeAdaptivity() {
+            document.getElementById("alphaTextBox").value = '0.0';
+            document.getElementById("betaTextBox").value = '0.0'; 
+        }
+    </script>
+
+    <style>
+            * {
+                user-select: none;
+            }
+
+            body {
+                background-color: #111;
+                margin: 0;
+            }
+    </style>
+</head>
+<body onload="startDemo();">
+
+<div style="margin:10px 10px;">
+
+    <table style="width:100%;display:grid;">
+<tr style="width:100%"><td style="width:100%;display:grid;">
+
+                           <table style="width:99%">
+
+                               <tr>
+                                   <td colspan="2">
+
+                                       <span style="color:white">Presets</span>
+                                       <button onclick="preset1();">Rotating ball</button>
+                                       <button onclick="preset2();">Moving wave</button>
+                                       <button onclick="preset3();">Orbit</button>
+                                       <button onclick="preset4();">Sharp moving front</button>
+
+
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Mesh density function (u)</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="ufuncTextBox" value="1.0/(1.0 + 1.0/(1.0 + 200.0*exp(- 200.0*((x-0.5*cos(t)) * (x-0.5*cos(t)) + ((y-0.5*sin(t)) * (y-0.5*sin(t)))) )) )" style="width:100%"></input>
+                                       <button onclick="funcShaderChange=true;">Update</button>
+                                   </td>
+                               </tr>
+
+                               <tr>
+                                   <td>
+                                       <label style="color:white;float:left">Adaptivity to u function (Alpha)</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="alphaTextBox" value="0.0" style="width:100%" />
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Adaptivity to changes in u function (Beta)</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="betaTextBox" value="1.0" style="width:100%" />
+                                   </td>
+                               </tr>
+
+                               <tr style=" text-align:left;">
+                                   <td>
+                                       <label style="color:white;float:left">Boundary conditions</label>
+                                   </td>
+                                   <td>
+
+                                       <label style="color:white"> Natural </label>
+                                       <input type="radio" name="bcOption" value="natural" style="width:100%" checked />
+                                       <label style="color:white"> Dirichlet </label>
+                                       <input type="radio" name="bcOption" value="dirichlet" style="width:100%" />
+
+                                   </td>
+                               </tr>
+
+                               <tr>
+                                   <td>
+                                       <label style="color:white;float:left">Simulation time step</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="dtTextBox" value="0.02" style="width:100%" />
+                                   </td>
+                               </tr>
+
+                               <tr>
+                                   <td>
+                                       <label style="color:white;float:left">Mesh time step</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="dtauTextBox" value="10000.0" style="width:100%" />
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333; text-align:left;">
+                                   <td>
+                                       <label style="color:white;float:left">Jacobi iteration count</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="jacobiIterationTextBox" value="128" style="width:100%"/>
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333; text-align:left;">
+                                   <td>
+                                       <label style="color:white;float:left">Jacobi x0</label>
+                                   </td>
+                                   <td>
+                                       <label style="color:white"> Initial mesh </label>
+                                       <input type="radio" name="jacobiX0Option" value="xinit" style="width:100%"/>
+                                       <label style="color:white"> Last time step mesh </label>
+                                       <input type="radio" name="jacobiX0Option" value="xprev" style="width:100%" checked/>
+                                   </td>
+                               </tr>
+
+                               <tr>
+                                   <td>
+                                       <label style="color:white;float:left">Grid size horizontal</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="nXTextBox" value="64" style="width:100%"/>
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Grid size vertical</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="nYTextBox" value="64" style="width:100%" />
+                                   </td>
+                               </tr>
+
+
+                               <tr style=" text-align:left;">
+                                   <td>
+                                       <label style="color:white;float:left">Grid colour</label>
+                                   </td>
+                                   <td>
+                                       <label style="color:white"> White </label>
+                                       <input type="radio" name="gridColorOption" value="white" style="width:100%" checked />
+                                       <label style="color:white"> Red </label>
+                                       <input type="radio" name="gridColorOption" value="red" style="width:100%" />
+                                       <label style="color:white"> Off </label>
+                                       <input type="radio" name="gridColorOption" value="off" style="width:100%" />
+                                   </td>
+                               </tr>
+
+
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Grid line width</label>
+                                   </td>
+                                   <td>
+                                       <input type="text" id="gridLineWidth" value="0.002" style="width:100%" />
+                                   </td>
+                               </tr>
+
+                               <tr style=" text-align:left;">
+                                   <td>
+                                       <label style="color:white;float:left">Grid colour</label>
+                                   </td>
+                                   <td>
+                                       <input id="co1" type="radio" name="colorOption" value="0" style="width:100%"/>
+                                       <label for="co1" style="color:white"> Neon </label>
+                                       <input id="co2" type="radio" name="colorOption" value="1" style="width:100%" checked />
+                                       <label for="co2" style="color:white"> Jet </label>
+                                       <input id="co3" type="radio" name="colorOption" value="2" style="width:100%" />
+                                       <label for="co3" style="color:white"> HAL </label>
+                                   </td>
+                               </tr>
+
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Chemtrail</label>
+                                   </td>
+                                   <td>
+                                       <input type="checkbox" id="chemtrailCheck" style="width:100%" checked />
+                                   </td>
+                               </tr>
+                               <tr style="background-color:#333">
+                                   <td>
+                                       <label style="color:white;float:left">Chessboard</label>
+                                   </td>
+                                   <td>
+                                       <input type="checkbox" id="checkersCheck" style="width:100%" />
+                                   </td>
+                               </tr>
+
+
+                           </table>
+
+</td>
+<td style="padding-left:10px;">
+
+<table>
+<tr><td>
+    <button onclick="removeAdaptivity(); reset=true;funcShaderChange=true;" >Reset</button>
+</td><td style="float:right">
+    <button onclick="save()" >Save frame (Python)</button>
+<button onclick="saveSetR=true;">Save animation (Python)</button>
+</td></tr>
+<tr><td colspan="2">
+    <canvas id="movingmeshdemocanvas" width="500" height="500" ></canvas>
+</td></tr>
+</table>
+
+</td></tr></table>
+
+
+<br/><br/><br/><br/>
+<br/>
+    
+
+<br/>
+    <div style="height:5px;">&nbsp;</div>
+
+
+
+
+</div>
+
+</body>
+</html>
+
