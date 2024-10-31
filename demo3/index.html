@@ -1,0 +1,1758 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+	</script>
+
+	<style>
+		
+	</style>
+
+	<script type="text/javascript">
+		normal = `
+		:root {
+			color-scheme: dark light;
+			--col1: #EEE9D5;
+			--col2: #9FBEB8;
+			--col3: #6B7FD7;
+			--col4: #BDEDF6;
+			--col5: #0E1C27;
+
+			--grid_border: light-dark(#222, #ddd);
+			--g6bb: light-dark(#000, #ddd);
+			--gbt: light-dark(#333, #ddd);
+			--gbbg: light-dark(#fff, #000);
+			--cgbbg: light-dark(#000, #fff);
+
+			--cgbbg_itm: light-dark(#000, #fff);
+			--cgbbg_select: light-dark(#3c7, #00f);
+
+			--bg1: light-dark(#eeeeee, #000);
+			--bg2: light-dark(#dddddd, #333);
+
+			--path1: light-dark(#000f, #dddf);
+			--wrapper_bg: light-dark(#fff, #000);
+		}
+		`;
+
+		dark = `
+		:root {
+			color-scheme: dark light;
+			--col1: #EEE9D5;
+			--col2: #9FBEB8;
+			--col3: #6B7FD7;
+			--col4: #BDEDF6;
+			--col5: #0E1C27;
+
+			--grid_border: #ddd;
+			--g6bb:  #ddd;
+			--gbt: #ddd;
+			--gbbg: #000;
+			--cgbbg: #fff;
+
+			--cgbbg_itm: #fff;
+			--cgbbg_select: #00f;
+
+			--bg1: #000;
+			--bg2: #333;
+
+			--path1: #dddf;
+			--wrapper_bg: #000;
+		}
+		`;
+
+		style = document.createElement('style');
+		today = new Date();
+		style.innerHTML = (today.getDate()==31 && today.getMonth()==9) ? dark : normal; // force dark mode in halloween, otherwise browser preference  
+		document.getElementsByTagName('head')[0].appendChild(style);
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="./style.css" />
+
+	<script type="text/javascript" src="./pde_fdm_be.js"></script>
+	<script type="text/javascript" src="./plotter.js"></script>
+	<script type="text/javascript" src="./pde_fdm_ade_bc.js"></script>
+</head>
+
+<body>
+
+	<div id="big_wrapper">
+
+		<div style="display:table; width:100%;">
+			<h5 style="float:left; color:#c04; cursor: pointer;"> &nbsp; &lt; <a href="..">Other demos</a> </h5>
+			<h4 style="float:right;"> 1d crd pde solver </h4>
+		</div>
+
+		<div style="margin:auto;vertical-align:middle;display:table;
+		display:grid; grid-template-columns: repeat(2, 1fr); ">
+
+			<div style="grid-column: 1 / 1; grid-row: 1 / 1;
+			display: grid; grid-template-columns: repeat(4, 1fr); " id="div_left">
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 1 / 2;
+				display: grid; grid-template-columns: subgrid;">
+
+					<div style="grid-column: 1 / 5; grid-row: 1 ;">
+						<p>\( u : \{(t, x) : 0 < t, x_{\text{left}} \le x \le x_{\text{right}} \} \to \mathbb{R} \)</p>
+					</div>
+					<div style="grid-column: 1; grid-row: 2 ;">
+						<label>\(x_{\text{left}}\)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2 ;" data-tooltip="Define the leftmost bound on space">
+						<input type="text" value="0.0" id="textbox_xleft" style="width:100%" />
+					</div>
+					<div style="grid-column: 1; grid-row: 3 ;">
+						<label>\(x_{\text{right}}\)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 3 ;" data-tooltip="Define the rightmost bound on space">
+						<input type="text" value="1.0" id="textbox_xright" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 2 / 3;
+				display: grid; grid-template-columns: subgrid;">
+					<div style="grid-column: 1 / 5; grid-row: 1;">
+						<p>\( \frac{\partial u}{\partial t} = A(t,x) \frac{\partial^2 u}{\partial x^2} + B(t,x)
+							\frac{\partial u}{\partial x} + C(t,x) u + D(t,x) \)</p>
+					</div>
+					<div style="grid-column: 1; grid-row: 2;">
+						<label>\( A(t, x) \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2;"
+						data-tooltip="Define the diffusive term of the PDE (smoothing)">
+						<input type="text" value="9e-3" id="textbox_A" style="width:100%" />
+					</div>
+					<div style="grid-column: 1; grid-row: 3;">
+						<label>\( B(t, x) \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 3;"
+						data-tooltip="Define the convective term of the PDE (translation)">
+						<input type="text" value="-9e-1" id="textbox_B" style="width:100%" />
+					</div>
+					<div style="grid-column: 1; grid-row: 4;">
+						<label>\( C(t, x) \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 4;"
+						data-tooltip="Define the linear reactive term of the PDE (source/sink)">
+						<input type="text" value="-0.01" id="textbox_C" style="width:100%" />
+					</div>
+					<div style="grid-column: 1; grid-row: 5;">
+						<label>\( D(t, x) \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 5;"
+						data-tooltip="Define the constant reactive term of the PDE (source/sink)">
+						<input type="text" value="0.7*x*x*x" id="textbox_D" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 3 / 4;
+				display: grid; grid-template-columns: subgrid;">
+					<div style="grid-column: 1 / 5; grid-row: 1;">
+						<p>\( u(t=0, x) = u_{0}(x) \)</p>
+					</div>
+					<div style="grid-column: 1; grid-row: 2;">
+						<label>\( u_{0}(x) \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2;"
+						data-tooltip="The initial condition (what the calculation starts from). Common math operations are permitted (sin, cos, Heaviside, min, max, ...). ">
+						<input type="text" value="0.5 + 0.15*sin(0.5*pi*x)" id="textbox_u0" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 4;
+				display: grid; grid-template-columns: subgrid;">
+
+					<div style="grid-column: 1 / 5; grid-row: 1;">
+						<p>\( \alpha_{0} \; u\Big|_{x=x_{\text{left}}}
+							+ \beta_{0} \; \frac{\partial u}{\partial x}\Big|_{x=x_{\text{left}}}
+							+ \gamma_{0} \; \frac{\partial^2 u}{\partial x^2}\Big|_{x=x_{\text{left}}}
+							= \epsilon_{0}
+							\)</p>
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 2;">
+						<label>\( \alpha_{0} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2;"
+						data-tooltip=" For the Dirichlet boundary condition set &alpha;=1, &beta;=0, &gamma;=0 and &epsilon; equal to the Dirichlet condition. You can also get a good approximation for periodic conditions using u[demo.NX-1] which is u at the previous time-step. ">
+						<input type="text" value="1.0" id="textbox_u_left_alpha" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 3;">
+						<label>\( \beta_{0} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 3;"
+						data-tooltip=" For the Neumann boundary condition set &alpha;=0, &beta;=1, &gamma;=0 and &epsilon; equal to the Neumann condition ">
+						<input type="text" value="0.0" id="textbox_u_left_beta" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 4;">
+						<label>\( \gamma_{0} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 4;"
+						data-tooltip=" For the linearity boundary condition set &alpha;=0, &beta;=0, &gamma;=1 and &epsilon;=0 ">
+						<input type="text" value="0.0" id="textbox_u_left_gamma" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 5;">
+						<label>\( \epsilon_{0} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 5;" data-tooltip="Define the left boundary condition">
+						<input type="text" value="0.5 + 0.15 * sin(1.5 * t * pi)" id="textbox_u_left_epsilon"
+							style="width:100%" />
+					</div>
+
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 5;
+				display: grid; grid-template-columns: subgrid;">
+
+					<div style="grid-column: 1 / 5; grid-row: 1;">
+						<p>\( \alpha_{N} u\Big|_{x=x_{\text{right}} }
+							+ \beta_{N} \frac{\partial u}{\partial x}\Big|_{x=x_{\text{right}} }
+							+ \gamma_{N} \frac{\partial^2 u}{\partial x^2}\Big|_{x=x_{\text{right}} }
+							= \epsilon_{N} \)</p>
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 2;">
+						<label>\( \alpha_{N} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2;"
+						data-tooltip=" For the Dirichlet boundary condition set &alpha;=1, &beta;=0, &gamma;=0 and &epsilon; equal to the Dirichlet condition. You can also get a good approximation for periodic conditions using u[0] which is u at the previous time-step. ">
+						<input type="text" value="0.0" id="textbox_u_right_alpha" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 3;">
+						<label>\( \beta_{N} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row:3;"
+						data-tooltip=" For the Neumann boundary condition set &alpha;=0, &beta;=1, &gamma;=0 and &epsilon; equal to the Neumann condition ">
+						<input type="text" value="0.0" id="textbox_u_right_beta" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 4;">
+						<label>\( \gamma_{N} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 4;"
+						data-tooltip=" For the linearity boundary condition set &alpha;=0, &beta;=0, &gamma;=1 and &epsilon;=0 ">
+						<input type="text" value="1.0" id="textbox_u_right_gamma" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 5;">
+						<label>\( \epsilon_{N} \)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 5;" data-tooltip="Define the right boundary condition">
+						<input type="text" value="0.0" id="textbox_u_right_epsilon" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 6;
+				display: grid; grid-template-columns: subgrid;">
+					<div style="grid-column: 1 / 1; grid-row: 1;">
+						<label>NX</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 1;"
+						data-tooltip="Number of nodes to use for approximating u">
+						<input type="text" value="32" id="textbox_NX" style="width:100%" />
+					</div>
+
+					<div style="grid-column: 1 / 1; grid-row: 2;">
+						<label>NT</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 2;"
+						data-tooltip="NT is taken relative to 1.0 to get dt, it is not actually the number of time-steps, but it is taken in the same order of NX to investigate stability of the ADE method with different dx and dt">
+						<input type="text" value="128" id="textbox_NT" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 7;
+				display: grid; grid-template-columns: subgrid;">
+					<div style="grid-column: 1 / 1; grid-row: 1;">
+						<label>\(\chi\)</label>
+					</div>
+					<div style="grid-column: 2 / 5; grid-row: 1;"
+						data-tooltip=" Ordinarily the U and V of the BCTY would be reset to u at each step. This input parameter allows some modulation between the full reset (1.0) done at each step or no resetting at all (0.0). Some problems can actually be solved very well without any resetting and this input can be used to investigate those.  ">
+						<input type="text" value="1.0" id="textbox_ade_resetting" style="width:100%" />
+					</div>
+				</div>
+
+				<div style=" border-width:0.2px; border-color:var(--grid_border); border-style: solid; padding:10px; margin-bottom: 2px;
+				grid-column: 1 / 5; grid-row: 8;
+				display: grid; grid-template-columns: subgrid;">
+					<div style="grid-column: 1 / 5; grid-row: 1;">
+						<button data-tooltip="Reset the calculation (t = 0.0)" onclick="reset=1;">Reset</button>
+					</div>
+				</div>
+			</div>
+
+			<div style="grid-column: 2 / 2; grid-row: 1 / 1;
+			display: grid; 
+			" id="div_right">
+				<div>
+					<div style="position:relative;   ">
+						<svg id="graph6" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+							<defs>
+								<linearGradient id="Gradient2" x1="0" x2="1.0" y1="0.0" y2="1">
+									<stop offset="0%" stop-color="#fcc" />
+									<stop offset="30%" stop-color="#fcc" stop-opacity="1.0" />
+									<stop offset="45%" stop-color="#fcc" stop-opacity="1.0" />
+									<stop offset="50%" stop-color="#fff" stop-opacity="1.0" />
+									<stop offset="55%" stop-color="#fcc" stop-opacity="1.0" />
+									<stop offset="70%" stop-color="#fcc" stop-opacity="1.0" />
+									<stop offset="100%" stop-color="#fcc" />
+								</linearGradient>
+							</defs>
+
+							<g id="graph6_contents"></g>
+							<path id="graph6_bounding_box" fill="none" stroke="var(--g6bb)" stroke-width="0.001" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							<text x="0.025" y="0.94" font-size="0.025" id="graph6_bl_text" fill="var(--g6bb)">.</text>
+							<g id="graph6_error" opacity="0.0">
+								<rect x="0" y="0" rx="0" ry="0" width="1" height="1" fill="url(#Gradient2)" />
+								<text x="0.05" y="0.45" font-size="0.03" id="graph6_err_text" fill="#333">Simulation
+									failed (oscillation detected). Please check the input parameters.</text>
+							</g>
+							<circle id="graph6_pointer" cx="-10" cy="0" r="0.005" fill="red" stroke="none"></circle>
+						</svg>
+
+						<div style="position: absolute; top:10px; left:10px; padding-left: 4px; padding-right: 10px; 
+					background-color: var(--gbbg); border-radius: 5px; 
+					border:var(--cgbbg) 1px solid;">
+
+							<input type="radio" checked name="plot" value="plot_main" />
+							<label>
+								Plot BCTY &amp; BTCS \(u\)</label> <br />
+
+							<input type="radio" id="checkbox_UV" name="plot" value="plot_uv" />
+							<label>Plot BCTY \(u\), \(U\) and \(V\)</label> <br />
+
+							<div
+								style="width:100%; height:1px; border-bottom: 1px red; padding-bottom: 1px; margin-bottom: 1px; background-color: #ccc;;">
+								&nbsp;</div>
+
+							<input type="checkbox" id="checkbox_scale_y_axis" />
+							<label>Scale y-axis</label> <br />
+
+							<input type="checkbox" id="checkbox_plot_u0" />
+							<label>Plot \(u_0\)</label>
+						</div>
+
+						<div style="position: absolute; bottom:10px; right:10px; padding-top:4px; padding-left: 4px; padding-right: 10px; 
+					background-color: var(--gbbg); border-radius: 1px; 
+					border:var(--cgbbg) 1px solid;" hidden id="legend_uu">
+							<svg style="height:14px;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<path fill="#00f" stroke="none" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							</svg>
+							<label data-tooltip2="Backward Time Central Space scheme">BTCS</label> <br />
+
+							<svg style="height:14px;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<path fill="#f00" stroke="none" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							</svg>
+							<label data-tooltip2="Barakat and Clark, Towler and Yang scheme">BCTY</label>
+						</div>
+
+
+						<div style="position: absolute; bottom:10px; right:10px; padding-top:4px; padding-left: 4px; padding-right: 10px; 
+					background-color: var(--gbbg); border-radius: 1px; 
+					border:var(--cgbbg) 1px solid;" hidden id="legend_UV">
+							<svg style="height:14px;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<path fill="#00f" stroke="none" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							</svg>
+							<label>\(U^{n+1}\)</label> <br />
+
+							<svg style="height:14px;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<path fill="#0f0" stroke="none" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							</svg>
+							<label>\(V^{n+1}\)</label> <br />
+
+							<svg style="height:14px;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<path fill="#f00" stroke="none" d="M 0,0
+							L 1,0
+							L 1,1
+							L 0,1
+							z" />
+							</svg>
+							<label>\(u^{n+1}\)</label>
+						</div>
+
+						<div style="position: absolute; bottom:10px; left:10px; padding-top:4px; padding-left: 4px; padding-right: 10px; 
+					background-color: var(--gbbg);">
+
+
+							<svg class="hover" width="16" height="18" viewBox="0 0 6 18" onclick="state='pause';">
+								<g id="svg_pause" fill="var(--cgbbg_itm)">
+									<path d="M0 2.87
+								a1 1 0 0 1 0.9-.83
+								a1 1 0 0 1 0.9 .83
+								l0 12
+								a1 1 0 0 1 -0.9 .83
+								a1 1 0 0 1 -0.9 -.83
+								z" fill="inherit"></path>
+
+									<path d="M3.5 2.87
+								a1 1 0 0 1 0.9 -.83
+								a1 1 0 0 1 0.9 .83
+								l0 12
+								a1 1 0 0 1 -0.9 .83
+								a1 1 0 0 1 -0.9 -.83
+								z" fill="inherit"></path>
+								</g>
+							</svg>
+
+							<svg class="hover" width="20" height="18" viewBox="0 0 17 18" onclick="state='play';">
+								<path id="svg_play" d="M0 2.87 
+							a1 1 0 0 1 1.55-.83
+							l9.2 6.13
+							a1 1 0 0 1 0 1.66
+							l-9.2 6.13
+							a1 1 0 0 1 -1.55 -.83
+							z" fill="var(--cgbbg_itm)"></path>
+							</svg>
+
+							<svg class="hover" width="20" height="18" viewBox="0 0 20 18" onclick="state='play_fast';">
+								<g id="svg_play_fast" fill="var(--cgbbg_itm)">
+									<path d="M0 2.87
+								a1 1 0 0 1 1.55-.83
+								l9.2 6.13
+								a1 1 0 0 1 0 1.66
+								l-9.2 6.13
+								a1 1 0 0 1 -1.55 -.83
+								z" fill="inherit"></path>
+
+									<path d="M6 2.87
+								a1 1 0 0 1 1.55-.83
+								l9.2 6.13
+								a1 1 0 0 1 0 1.66
+								l-9.2 6.13
+								a1 1 0 0 1 -1.55 -.83
+								z" fill="inherit"></path>
+								</g>
+							</svg>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			reset = 1;
+			state = 'play';
+
+			max = Math.max;
+			min = Math.min;
+			abs = Math.abs;
+			cos = Math.cos;
+			sin = Math.sin;
+			exp = Math.exp;
+			log = Math.log;
+			ln = log;
+			pi = Math.PI;
+			H = function (x) { return (x < 0.0) ? 0.0 : 1.0; }
+			Heaviside = H;
+			tan = Math.tan;
+
+			var graph6 = document.getElementById('graph6');
+
+			var textbox_xleft = document.getElementById('textbox_xleft');
+			var textbox_xright = document.getElementById('textbox_xright');
+
+			var textbox_A = document.getElementById('textbox_A');
+			var textbox_B = document.getElementById('textbox_B');
+			var textbox_C = document.getElementById('textbox_C');
+			var textbox_D = document.getElementById('textbox_D');
+
+			var textbox_u0 = document.getElementById('textbox_u0');
+
+			var textbox_u_left_alpha = document.getElementById('textbox_u_left_alpha');
+			var textbox_u_left_beta = document.getElementById('textbox_u_left_beta');
+			var textbox_u_left_gamma = document.getElementById('textbox_u_left_gamma');
+			var textbox_u_left_epsilon = document.getElementById('textbox_u_left_epsilon');
+
+			var textbox_u_right_alpha = document.getElementById('textbox_u_right_alpha');
+			var textbox_u_right_beta = document.getElementById('textbox_u_right_beta');
+			var textbox_u_right_gamma = document.getElementById('textbox_u_right_gamma');
+			var textbox_u_right_epsilon = document.getElementById('textbox_u_right_epsilon');
+
+			var textbox_NX = document.getElementById('textbox_NX');
+			var textbox_NT = document.getElementById('textbox_NT');
+
+			var select_solver = document.getElementById('select_solver');
+			var graph6_bl_text = document.getElementById('graph6_bl_text');
+			var graph6_error = document.getElementById('graph6_error');
+			var textbox_ade_resetting = document.getElementById('textbox_ade_resetting');
+			var checkbox_UV = document.getElementById('checkbox_UV');
+			var checkbox_plot_u0 = document.getElementById('checkbox_plot_u0');
+			var checkbox_scale_y_axis = document.getElementById('checkbox_scale_y_axis');
+
+			var svg_pause = document.getElementById('svg_pause');
+			var svg_play_fast = document.getElementById('svg_play_fast');
+			var svg_play = document.getElementById('svg_play');
+
+			var legend_uu = document.getElementById('legend_uu');
+			var legend_UV = document.getElementById('legend_UV');
+
+			var graph6_contents = document.getElementById("graph6_contents");
+
+			var marker_post = -1;
+
+			demo = {};
+			demo.t = 0.0;
+			demo.A = 1.0;
+			demo.B = 0.0;
+			demo.C = 0.0;
+			demo.D = 0.0;
+
+			demo.ymin = 0.0;
+			demo.ymax = 1.0;
+
+			function NaN_protect(component, output) {
+				let input = component.value;
+				component.style.backgroundColor = 'none';
+				if (input.length <= 0) {
+					component.style.backgroundColor = '#faa';
+					return output;
+				}
+				if (Boolean(Number(input))) {
+					component.style.backgroundColor = '#afa';
+					return Number(input);
+				} else {
+					// is it a function of x,y
+					try {
+						x = 0, t = 0, A = 0, B = 0, C = 0, D = 0, var1 = 0, var2 = 0, var3 = 0, var4 = 0, var5 = 0, v1 = 0, v2 = 0, v3 = 0, v4 = 0, v5 = 0;
+						eval(input);
+						component.style.backgroundColor = '#afa';
+						return input;
+					} catch {
+						component.style.backgroundColor = '#faa';
+						return output;
+					}
+				}
+			}
+
+			demo.u_left_alpha = 1.0;
+			demo.u_left_beta = 0.0;
+			demo.u_left_gamma = 0.0;
+			demo.u_left_epsilon = 0.0;
+
+			demo.u_right_alpha = 1.0;
+			demo.u_right_beta = 0.0;
+			demo.u_right_gamma = 0.0;
+			demo.u_right_epsilon = 0.0;
+
+			demo.ade_resetting = 0.0;
+
+			demo.ymin = 0.0;
+			demo.ymax = 1.0;
+
+			var thomas_c;
+			var thomas_y;
+			var dt;
+			var u_be;
+
+			pause_tick = function () { if (state != 'pause') { tick(); } else { setTimeout(pause_tick, 100); } }
+
+			var tick_count = 0;
+			var first_step = 1;
+			tick = function () {
+
+				rect = graph6.getBoundingClientRect();
+				viewHeight = document.documentElement.clientHeight;
+				if ((rect.bottom < 0 || rect.top - viewHeight >= 0) && !first_step) {
+					setTimeout(tick, 500);
+					return;
+				}
+
+				svg_pause.style.fill = (state == 'pause') ? 'var(--cgbbg_select)' : 'var(--cgbbg_itm)';
+				svg_play.style.fill = (state == 'play') ? 'var(--cgbbg_select)' : 'var(--cgbbg_itm)';
+				svg_play_fast.style.fill = (state == 'play_fast') ? 'var(--cgbbg_select)' : 'var(--cgbbg_itm)';
+
+				demo.xleft = NaN_protect(textbox_xleft, demo.xleft);
+				demo.xright = NaN_protect(textbox_xright, demo.xright);
+				demo.xleft = eval(demo.xleft);
+				demo.xright = eval(demo.xright);
+
+				demo.A = NaN_protect(textbox_A, demo.A);
+				demo.B = NaN_protect(textbox_B, demo.B);
+				demo.C = NaN_protect(textbox_C, demo.C);
+				demo.D = NaN_protect(textbox_D, demo.D);
+
+				demo.u_left_alpha = NaN_protect(textbox_u_left_alpha, demo.u_left_alpha);
+				demo.u_left_beta = NaN_protect(textbox_u_left_beta, demo.u_left_beta);
+				demo.u_left_gamma = NaN_protect(textbox_u_left_gamma, demo.u_left_gamma);
+				demo.u_left_epsilon = NaN_protect(textbox_u_left_epsilon, demo.u_left_epsilon);
+
+				demo.u_right_alpha = NaN_protect(textbox_u_right_alpha, demo.u_right_alpha);
+				demo.u_right_beta = NaN_protect(textbox_u_right_beta, demo.u_right_beta);
+				demo.u_right_gamma = NaN_protect(textbox_u_right_gamma, demo.u_right_gamma);
+				demo.u_right_epsilon = NaN_protect(textbox_u_right_epsilon, demo.u_right_epsilon);
+
+				demo.u0 = NaN_protect(textbox_u0, demo.u0);
+
+				demo.ade_resetting = NaN_protect(textbox_ade_resetting, demo.ade_resetting);
+
+				demo.NT = NaN_protect(textbox_NT, demo.NT);
+				demo.NT = eval(demo.NT);
+				if (demo.NT < 1) {
+					textbox_NT.style.backgroundColor = '#faa';
+					dt = 1.0;
+				} else {
+					dt = 1.0 / demo.NT;
+				}
+
+				oldNX = demo.NX;
+				demo.NX = NaN_protect(textbox_NX, demo.NX);
+				demo.NX = eval(demo.NX);
+				if (demo.NX < 3) {
+					textbox_NX.style.backgroundColor = '#faa';
+					demo.NX = 3;
+				}
+
+				if (!first_step && (oldNX != demo.NX || reset)) {
+					tick_count = 0; // reset for new arrays
+					delete u0, U, V, U_next, V_next, thomas_c, thomas_y, u_be;
+				}
+
+				if (tick_count == 0) {
+					thomas_c = new Float64Array(Array.from({ length: demo.NX }, (v, i) => { return 0.0; }));
+					thomas_y = new Float64Array(Array.from({ length: demo.NX }, (v, i) => { return 0.0; }));
+
+					u0 = new Float64Array(Array.from({ length: demo.NX }, (v, i) => {
+						x = demo.xleft + (i / (demo.NX - 1)) * (demo.xright - demo.xleft);
+						t = 0.0;
+						return eval(demo.u0);
+					}));
+
+					u = u0.slice(0);
+
+					U = u.slice(0);
+					V = u.slice(0);
+
+					U_next = u.slice(0);
+					V_next = u.slice(0);
+
+					u_be = u.slice(0);
+
+					demo.ymin = u0[0];
+					demo.ymax = u0[0];
+					for (i = 0; i < u0.length; ++i) {
+						demo.ymin = Math.min(demo.ymin, u0[i]);
+						demo.ymax = Math.max(demo.ymax, u0[i]);
+					}
+					demo.ymin -= 0.5;
+					demo.ymax += 0.5;
+
+					demo.t = 0.0;
+					reset = 0;
+				}
+
+				graph6_error.style.opacity = 0.0;
+
+				if (checkbox_UV.checked) {
+					legend_uu.setAttribute('hidden', '');
+					legend_UV.removeAttribute('hidden');
+
+					if (checkbox_plot_u0.checked) {
+						draw_plot_n(graph6_contents, [u0, u, U_next, V_next],
+							['var(--gbt)', '#f33f', '#3f3f', '#33ff'],
+							[0.0015, 0.0035, 0.0015, 0.0015,],
+						);
+					} else {
+						draw_plot_n(graph6_contents, [u, U_next, V_next], ['#f33f', '#3f3f', '#33ff', 'var(--gbt)'],
+							[0.0035, 0.0015, 0.0015, 0.0015],
+						);
+					}
+
+
+				} else {
+					legend_UV.setAttribute('hidden', '');
+					legend_uu.removeAttribute('hidden');
+
+					if (checkbox_plot_u0.checked) {
+						draw_plot_n(graph6_contents, [u, u_be, u0], ['#f33f', '#33ff', 'var(--gbt)'],
+							[0.0035, 0.0015, 0.0015, 0.0015]
+						);
+					} else {
+						draw_plot_n(graph6_contents, [u, u_be], ['#f33f', '#33ff', '#3f3f', '#f3ff'],
+							[0.0035, 0.0015, 0.0035, 0.0015]
+						);
+					}
+				}
+
+				if (marker_post >= 0) {
+					yx = 0.92 - 0.85 * (u[marker_post] - last_y_min) / (last_y_max - last_y_min);
+					graph6_pointer.setAttribute('cy', yx);
+				}
+
+				umin = u[0];
+				umax = u[0];
+				for (i = 0; i < demo.NX; ++i) {
+					umin = Math.min(u[i], umin);
+					umax = Math.max(u[i], umax);
+				}
+				marker_post_x = demo.xleft + (marker_post / (demo.NX - 1)) * (demo.xright - demo.xleft);
+				graph6_bl_text.innerHTML = `t=${Math.round(demo.t * 100.0) / 100.0}, x=${Math.round(marker_post_x * 10000.0) / 10000.0}, BCTY u=${Math.round(u[marker_post] * 10000.0) / 10000.0}, BTCS u=${Math.round(u_be[marker_post] * 10000.0) / 10000.0}`;
+
+				step_bc_ade_eval();
+				step_be_soln_eval();
+
+				demo.t += dt;
+				tick_count += 1;
+
+				if (u[0] != u[0] || umax > 1e5 || umin < -1e5) {
+					console.log('NaN in output.');
+					reset = 1;
+					graph6_error.style.opacity = 1.0;
+					graph6_contents.innerHTML = '';
+					setTimeout(tick, 2000);
+				} else {
+					if (state == 'play_fast') {
+						requestAnimationFrame(tick);
+					} else if (state == 'play') {
+						setTimeout(tick, 100);
+					} else if (state == 'pause') {
+						setTimeout(pause_tick, 200);
+					} else {
+						setTimeout(tick, 500);
+					}
+				}
+
+				first_step = 0;
+			}
+
+		</script>
+
+
+
+
+		<script type="text/javascript">
+			var graph6_elm = document.getElementById('graph6');
+			var div_left = document.getElementById('div_left');
+			var div_right = document.getElementById('div_right');
+			var big_wrapper = document.getElementById('big_wrapper');
+
+			window.addEventListener('resize', resizeCanvas, false);
+
+			function resizeCanvas() {
+				right = div_left.getClientRects()[0].right;
+
+				m1 = big_wrapper.getClientRects()[0].width * 0.6;
+
+				graph6_elm.style.width = `${m1}px`;
+				graph6_elm.style.height = graph6_elm.style.width;
+			}
+
+			resizeCanvas();
+		</script>
+
+
+		<div style="padding-left:30px;padding-right:10px;">
+
+
+			<br /><br />
+			<h3>Description</h3>
+			<br /><br />
+
+			<p>
+				To keep things simple, we will assume in the discussion below that Dirichlet boundary conditions are
+				used, but the method
+				has been adapted in the above to accept more general boundary conditions.
+				Your mileage may vary warning: no controls are made for confirming the existence
+				and uniqueness
+				of the solution for different boundary conditions that are entered above. Indeed in many cases,
+				especially with pure Neumann
+				or "linearity" boundary
+				conditions, these safety nets do not exist.
+
+				For Dirichlet conditions, however, \(u\) is fixed
+				along the boundaries, namely if we let \(u_{i}^{n} \approx u(t_{n}, x_{i}) \) denote our approximation,
+				then
+				\(u_{0}^{n+1} \equiv u_{\text{left}}\) and \(u_{\text{NX}}^{n+1} \equiv u_{\text{right}}\) for all
+				\(n\), possibly
+				with \(u_{\text{left}}\) and \(u_{\text{right}}\) being functions of \(t\).
+
+				At intermediary nodes between the boundaries, we define the semi-discretisation \(u_{i}\) as
+				\[
+				\frac{\partial u_{i}}{\partial t} = A_{i} \frac{(u_{i+1} - u_{i}) - (u_{i} - u_{i-1})}{ \Delta x^2 }
+				+ B_{i} \frac{u_{i+1} - u_{i-1}}{2 \Delta x}
+				+ C_{i} u_{i}
+				+ D_{i}
+				\tag{1}
+				\label{eq_1}
+				\]
+				where \(A_{i} = A(t, x_{i})\), \(B_{i} = B(t, x_{i})\), \(C_{i} = C(t, x_{i})\) and \(D_{i} = D(t,
+				x_{i})\).
+				In this way, both the diffusion and convection terms are
+				discretised using central difference schemes.
+
+				There are two different time schemes implemented in the graph above. One scheme is the common
+				Backward Time Central Difference, or BTCS, approximation given by
+				\[
+				\frac{u_{i}^{n+1} - u_{i}^{n} }{\Delta t} = A_{i} \frac{(u_{i+1}^{n+1} - u_{i}^{n+1}) - (u_{i}^{n+1} -
+				u_{i-1}^{n+1})}{ \Delta x^2 }
+				+ B_{i} \frac{u_{i+1}^{n+1} - u_{i-1}^{n+1}}{2 \Delta x}
+				+ C_{i} u_{i}^{n+1}
+				+ D_{i}
+				\]
+				where the values of the spatial discretisation nodes are defined implicitly at the future time-step.
+				Notice that this can be re-written as
+				\[
+				\left( 1- \frac{A_{i}}{\Delta x^2} + \frac{B_{i}}{2 \Delta x} \right) u_{i-1}^{n+1}
+				+ \left( \frac{1}{\Delta t} + \frac{2 A_{i}}{\Delta x^2} - C_{i} \right) u_{i}^{n+1}
+				+ \left( - \frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x} \right) u_{i+1}^{n+1}
+				= \frac{1}{\Delta t} u^{n}_{i} + D_{i}
+				\]
+				or, for convenience, if we let
+				\[
+				\alpha_{i} = - \frac{A_{i}}{\Delta x^2} + \frac{B_{i}}{2 \Delta x}, \qquad
+				\beta_{i} = \frac{1}{\Delta t} + \frac{2 A_{i}}{\Delta x^2} - C_{i}, \qquad
+				\gamma_{i} = - \frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x}, \qquad
+				\epsilon_{i} = \frac{1}{\Delta t} u_{i}^{n} + D_{i},
+				\]
+				then we have the system of equations
+				\[
+				\begin{align}
+				& &u_{0}& & & & & & &=& &u_{\text{left}},& \\
+				& & \alpha_{i} u_{i-1}^{n+1}& &+ \beta_{i} u_{i}^{n+1}& &+ \gamma_{i} &u_{i+1}^{n+1}& &=&
+				&\epsilon_{i},&
+				\qquad (i=1, 2, \dots, \text{NX}-1), \\
+				& & & & & & &u_{N}& &=& &u_{\text{right}}.&
+				\end{align}
+				\]
+
+				This system can be solved using elementary row operations or, in this case, as we have a tridiagonal
+				system,
+				by the famed Thomas algorithm which is demonstrated below for \(\text{NX}=10\).
+				<br /><br />
+			</p>
+
+			<div style="display:flex; width:100%; margin:auto;">
+
+				<svg style="margin:auto; padding-left:4px;" id="demo7_svg" width="100%" viewBox="-0.51 -0.01 4.02 1.02"
+					xmls="http://www.w3.org/2000/svg">
+					<g id="demo7b_contents"></g>
+
+					<path id="demo7_path" fill="none" stroke="red" stroke-width="0.005" d=""></path>
+					<path id="demo7_path2" fill="none" stroke="green" stroke-width="0.0025" d=""></path>
+					<path id="demo7_path3" fill="none" stroke="blue" stroke-width="0.005" d=""></path>
+
+					<circle id="demo6_circle" cx="-10" cy="0" r="0.01" fill="red" stroke="none"></circle>
+					<circle id="demo6_circle2" cx="-10" cy="0" r="0.01" fill="red" stroke="none"></circle>
+					<circle id="demo6_circle3" cx="-10" cy="0" r="0.01" fill="red" stroke="none"></circle>
+
+				</svg>
+
+				<script type="text/javascript">
+
+					var demo7b_contents = document.getElementById('demo7b_contents');
+					var demo7_row = 0;
+					var demo7_row_direction = 1;
+					var demo7_row_state = [
+						'initial', 'initial', 'initial',
+						'initial', 'initial', 'initial',
+						'initial', 'initial', 'initial',
+						'initial'
+					];
+					var demo7_next = 'normal';
+
+					function demo7_tick() {
+
+						rect = demo7b_contents.getBoundingClientRect();
+						viewHeight = document.documentElement.clientHeight;
+						if ((rect.bottom < 0 || rect.top - viewHeight >= 0) && !first_step) {
+							setTimeout(demo7_tick, 500);
+							return;
+						}
+
+						mtmp = '';
+
+						x0 = -0.4025;
+
+						x = x0; y = 0.06; w = 0.25; h = 0.1;
+
+						y = 0.06;
+						x2 = x;
+						for (i = 0; i < 10; ++i) {
+							if (demo7_row_state[i] == 'initial' || i == 0 || i == 9) {
+							} else if (demo7_row_state[i] == 'zerod') {
+							} else if (demo7_row_state[i] == 'normed') {
+								mtmp += `<text x="${x2 - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">b${i} = &beta;${i} - &alpha;${i}c${i - 1}</text>`;
+							} else if (demo7_row_state[i] == 'back_sub') {
+								mtmp += `<text x="${x2 - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">b${i} = &beta;${i} - &alpha;${i}c${i - 1}</text>`;
+							}
+							y += h;
+						}
+						y = 0.06;
+
+						x += w * 0.7;
+						x0 = x;
+						row_x_off = x;
+
+
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x0} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+
+						if (demo7_row_state[0] == 'back_sub' || demo7_row_state[0] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+						} else {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">c0 = 0</text>`;
+						}
+						y += h;
+
+						for (i = 1; i < 9; ++i) {
+							if (demo7_row_state[i] == 'initial') {
+								x = row_x_off;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&alpha;${i}</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;${i}</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&gamma;${i}</text>`;
+							} else if (demo7_row_state[i] == 'zerod') {
+								x = row_x_off;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+								x += w;
+								mtmp += `<text x="${x - 0.055}" y="${y}" font-size="0.04" fill="var(--g6bb)">b${i} = &beta;${i} - &alpha;${i}&gamma;${i - 1}</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&gamma;${i}</text>`;
+								x += w;
+							} else if (demo7_row_state[i] == 'normed') {
+								x = row_x_off;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+								x += w;
+								mtmp += `
+							<text x="${x - 0.09}" y="${y}" font-size="0.04" fill="var(--g6bb)">c${i} = </text>
+							<text x="${x}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&gamma;${i}</text>
+							<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x} ${y - 0.01} l 0.04 0.0"></path>
+							<text x="${x}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">b${i}</text>`;
+							} else if (demo7_row_state[i] == 'back_sub') {
+								x = row_x_off;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+								x += w;
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+							}
+							row_x_off += w;
+							y += h;
+						}
+
+						x = x0 + w * 8;
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+						x += w;
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+						x += w * 0.2;
+
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+						x += w * 0.25;
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+						x += w * 0.0;
+						y = 0.06;
+						for (i = 0; i < 10; ++i) {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+							y += h;
+						}
+						x += w * 0.3;
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+						x += w * 0.25;
+						mtmp += `<text x="${x}" y="0.5" font-size="0.09" fill="var(--g6bb)">=</text>`;
+
+						x += w * 0.5;
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+						x += w * 0.35;
+						x2 = x + 0.325;
+						x3 = x2 + 0.25;
+						y = 0.06;
+
+						if (demo7_row_state[0] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_left</text>`;
+						} else if (demo7_row_state[0] != 'back_sub') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r0 = u_left</text>`;
+						} else {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r0 = u_left</text>`;
+
+
+							mtmp += `<text x="${x3 - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">u</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${0}</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_left</text>`;
+						}
+						y += h;
+
+						for (i = 1; i < 9; ++i) {
+							if (demo7_row_state[i] == 'initial') {
+								mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon;${i}</text>`;
+							} else if (demo7_row_state[i] == 'zerod') {
+								mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon;${i} - &alpha;${i} r${i - 1}</text>`;
+							} else if (demo7_row_state[i] == 'normed') {
+								mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${i} = </text>
+						<text x="${x + 0.04}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">b${i}</text>
+									<text x="${x}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&epsilon;${i}</text>
+									<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x} ${y - 0.01} l 0.14 0.0"></path>
+									<text x="${x + 0.04}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)"> - &alpha;${i}  r${i - 1}</text> `;
+							} else if (demo7_row_state[i] == 'back_sub') {
+								mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${i} = </text>
+						<text x="${x + 0.04}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">b${i}</text>
+									<text x="${x}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&epsilon;${i}</text>
+									<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x} ${y - 0.01} l 0.14 0.0"></path>
+									<text x="${x + 0.04}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)"> - &alpha;${i}  r${i - 1}</text> `;
+
+								mtmp += `<text x="${x2 - 0.09}" y="${y}" font-size="0.04" fill="var(--g6bb)">c${i} = </text>
+							<text x="${x2}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&gamma;${i}</text>
+							<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x2} ${y - 0.01} l 0.04 0.0"></path>
+							<text x="${x2}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">b${i}</text>`;
+
+								mtmp += `<text x="${x3 - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">u</text>`;
+								mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${i}</text>`;
+								mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+								mtmp += `<text x="${x3 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = r${i} - c${i} </text>`;
+
+								mtmp += `<text x="${x3 + 0.13}" y="${y}" font-size="0.05" fill="var(--g6bb)">u</text>`;
+								mtmp += `<text x="${x3 + 0.13 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${i + 1}</text>`;
+								mtmp += `<text x="${x3 + 0.13 + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+							}
+							y += h;
+						}
+						if (demo7_row_state[9] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_right</text>`;
+						} else if (demo7_row_state[9] != 'back_sub') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+						} else {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+
+							mtmp += `<text x="${x3 - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">u</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${9}</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+							mtmp += `<text x="${x3 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_right</text>`;
+						}
+						y += h;
+
+						x += w * 0.65;
+						mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+						demo7b_contents.innerHTML = mtmp;
+
+						wait = 250;
+
+						if (demo7_row == -1) {
+							for (i = 0; i < demo7_row_state.length; ++i) {
+								demo7_row_state[i] = 'initial';
+							}
+							demo7_row_direction = 1;
+							demo7_row = 0;
+							wait *= 10;
+						}
+						else
+							if (demo7_row_direction == 1) {
+								if (demo7_next == 'normal') {
+									demo7_row_state[demo7_row] = 'normed';
+									demo7_next = 'zero';
+								} else if (demo7_next == 'zero') {
+									if (demo7_row + 1 < demo7_row_state.length) {
+										demo7_row_state[demo7_row + 1] = 'zerod';
+									}
+									demo7_row += 1;
+									demo7_next = 'normal';
+								}
+							}
+							else
+								if (demo7_row_direction == -1) {
+									demo7_row_state[demo7_row] = 'back_sub';
+									demo7_row -= 1;
+								}
+
+						if (demo7_row == demo7_row_state.length - 1) {
+							demo7_row_direction = -1;
+						}
+
+						setTimeout(demo7_tick, wait);
+					}
+
+					demo7_tick();
+
+				</script>
+			</div>
+
+			<p>
+				<br /><br />
+				This system of linear equations is solved at every time-step.
+				<br /><br />
+
+				The second scheme implemented above is the alternating direction explicit (ADE) method of
+				Barakat and Clark, with the Towler and Yang convection term.
+
+				Here we calculate an approximation for \(u^{n+1}\) using two other approximations \(U^{n+1}\) and
+				\(V^{n+1}\)
+				which have the same form as (\(\ref{eq_1}\)). That is, we compute
+				\[
+				u^{n+1}_{i} = \frac{1}{2} \left( U^{n+1}_{i} + V^{n+1}_{i} \right)
+				\]
+				where
+				\[
+				\begin{align}
+				\frac{U_{i}^{n+1} -U_{i}^{n} }{\Delta t} &= A \frac{(U_{i+1}^{n} - U_{i}^{n}) - (U_{i}^{n+1} -
+				U_{i-1}^{n+1})}{ \Delta x^2 }
+				+ B \frac{U_{i+1}^{n} - U_{i-1}^{n+1}}{2 \Delta x}
+				+ C U_{i}^{n+1}
+				+ D, \\
+				\frac{V_{i}^{n+1} -V_{i}^{n} }{\Delta t} &= A \frac{(V_{i+1}^{n+1} - V_{i}^{n+1}) - (V_{i}^{n} -
+				V_{i-1}^{n})}{ \Delta x^2 }
+				+ B \frac{V_{i+1}^{n+1} - V_{i-1}^{n}}{2 \Delta x}
+				+ C V_{i}^{n+1}
+				+ D,
+				\end{align}
+				\]
+				with \(U^{n+1}\) and \(V^{n+1}\) anchored to both boundary conditions \(U_{0}^{n+1} = u_{\text{left}}\)
+				and \(V_{N}^{n+1} = u_{\text{right}}\). The approximations
+				\(U^{n+1}_{i}\) and \(V^{n+1}_{i}\) are defined explicitly hence there is no system of linear equations
+				to be
+				solved, only two recurrence relations that need to be worked through from either direction.
+
+
+				This technique is familiar to numerical methods for propagating fronts,
+				and also has a strong resemblance to a Gauss-Seidel implementation of the BTCS scheme.
+
+
+				Notice that the BCTY scheme can be written as
+				\[
+				\begin{align}
+				\left( - \frac{A_{i} }{\Delta x^2} + \frac{B_{i}}{2 \Delta x} \right) U_{i-1}^{n+1}
+				+ \left( \frac{1}{\Delta t} + \frac{A_{i}}{\Delta x^2} - C_{i} \right) U_{i}^{n+1}
+				&= \left( \frac{1}{\Delta t} - \frac{A_{i}}{\Delta x^2} \right) U_{i}^{n}
+				+ \left( \frac{A_{i}}{\Delta x^2} + \frac{B_{i}}{2 \Delta x} \right) U_{i+1}^{n} + D_{i} \\
+				\left( \frac{1}{\Delta t} + \frac{A_{i}}{\Delta x^2} - C_{i} \right) V_{i}^{n+1}
+				+ \left( -\frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x} \right) V_{i+1}^{n+1}
+				&= \left( \frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x} \right) V_{i-1}^{n}
+				+ \left( \frac{1}{\Delta t} - \frac{A_{i}}{\Delta x^2} \right) V_{i}^{n}
+				+ D_{i}
+				\end{align}
+				\]
+				or, more conveniently, as
+				\[
+				\begin{align}
+				&U_{0}^{n+1} & & &=& &u_{\text{left}}, \\
+				\alpha^{U}_{i} &U_{i-1}^{n+1} &+\beta^{U}_{i} U_{i}^{n+1} & &=& &\epsilon^{U}_{i} \, , \quad &(i = 1,2,
+				\dots, N-1) \\
+				& &\hspace{1em}\beta^{V}_{j} V_{j}^{n+1} &+\gamma^{V}_{j} V_{j+1}^{n+1} &=& &\epsilon^{V}_{j} \, , \quad
+				&(j = N-1,N-2,
+				\dots, 1) \\
+				& & &\hspace{2em} V_{N}^{n+1} &=& &u_{\text{right}}, \\
+				\end{align}
+				\]
+				where
+				\[
+				\alpha^{U}_{i} = - \frac{A_{i} }{\Delta x^2} + \frac{B_{i}}{2 \Delta x},
+				\qquad \beta^{U}_{i} = \frac{1}{\Delta t} + \frac{A_{i}}{\Delta x^2} - C_{i},
+				\qquad \epsilon^{U}_{i} = \left( \frac{1}{\Delta t} - \frac{A_{i}}{\Delta x^2} \right) U_{i}^{n}
+				+ \left( \frac{A_{i}}{\Delta x^2} + \frac{B_{i}}{2 \Delta x} \right) U_{i+1}^{n} + D_{i}
+				\]
+				and
+				\[
+				\beta^{V}_{i} = \frac{1}{\Delta t} + \frac{A_{i}}{\Delta x^2} - C_{i},
+				\qquad \gamma^{V}_{i} = -\frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x}, \\
+				\qquad \epsilon^{V}_{i} =
+				\left( \frac{A_{i}}{\Delta x^2} - \frac{B_{i}}{2 \Delta x} \right) V_{i-1}^{n}
+				+ \left( \frac{1}{\Delta t} - \frac{A_{i}}{\Delta x^2} \right) V_{i}^{n}
+				+ D_{i}.
+				\]
+
+				Similarly to the BTCS method above, we show the two recurrence relations that define \(U_{i}^{n+1}\) and
+				\(V_{i}^{n+1}\) below.
+
+				<br /><br />
+			</p>
+
+			<div style="display:flex; width:100%; margin:auto;">
+
+				<svg style="margin:auto; padding-left:4px;width:100%;" viewBox="-0.32 -0.01 2.8 1.02"
+					xmls="http://www.w3.org/2000/svg">
+					<g id="demo8_contents"></g>
+				</svg>
+				<svg style="margin:auto; padding-left:4px;width:100%;" viewBox="-0.32 -0.01 2.8 1.02"
+					xmls="http://www.w3.org/2000/svg">
+					<g id="demo8b_contents"></g>
+				</svg>
+			</div>
+
+			<script type="text/javascript">
+
+
+				function subscript(x, y, ch, sp, sub, tight = false, override = 0) {
+					tmp = '';
+					tmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">${ch}</text>`;
+					if (!override) { override = 0.03; }
+					if (!tight) {
+						tmp += `<text x="${x + override}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${sub}</text>`;
+						tmp += `<text x="${x + override}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">${sp}</text>`;
+					} else {
+						tmp += `<text x="${x + 0.019}" y="${y + 0.015}" font-size="0.03" fill="var(--g6bb)">${sub}</text>`;
+						tmp += `<text x="${x + 0.019}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">${sp}</text>`;
+					}
+					return tmp;
+				}
+
+
+
+
+				var demo8_contents = document.getElementById('demo8_contents');
+				var demo8_row_states = ['initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial'];
+				var demo8_transitions = [[0, 'normed'],
+				[1, 'zerod'],
+				[1, 'normed'],
+				[2, 'zerod'],
+				[2, 'normed'],
+				[3, 'zerod'],
+				[3, 'normed'],
+				[4, 'zerod'],
+				[4, 'normed'],
+				[5, 'zerod'],
+				[5, 'normed'],
+				[6, 'zerod'],
+				[6, 'normed'],
+				[7, 'zerod'],
+				[7, 'normed'],
+				[8, 'zerod'],
+				[8, 'normed'],
+				[9, 'zerod'],
+				[9, 'normed'],
+				[9, 'back_sub']
+				];
+				var demo8_next_state = 0;
+
+
+
+
+				function demo8_tick() {
+					rect = demo8_contents.getBoundingClientRect();
+					viewHeight = document.documentElement.clientHeight;
+					if ((rect.bottom < 0 || rect.top - viewHeight >= 0) && !first_step) {
+						setTimeout(demo8_tick, 500);
+						return;
+					}
+
+					mtmp = '';
+
+					row_states = demo8_row_states;
+
+					x = -0.4025; y = 0.06; w = 0.2; h = 0.1;
+
+					x += w * 0.7;
+					row_x_off = x;
+
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+					x += w;
+					y += h;
+
+					for (i = 1; i < 9; ++i) {
+						x = row_x_off;
+						if (demo8_row_states[i] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&alpha;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">U</text>`;
+							x += w;
+
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">U</text>`;
+							x += w;
+						} else if (demo8_row_states[i] == 'zerod') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+							x += w;
+
+							mtmp += `<text x="${x - 0.055}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x - 0.055 + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.055 + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">U</text>`;
+							x += w;
+						} else if (demo8_row_states[i] == 'normed') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+							x += w;
+
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+							x += w;
+
+						} else if (demo8_row_states[i] == 'back_sub') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+							x += w;
+
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+							x += w;
+						}
+						row_x_off += w;
+						y += h;
+					}
+
+					x -= w;
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+					x += w;
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+
+					x += w * 0.2;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+
+
+					x += w * 0.3;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+					x += w * 0.0;
+					y = 0.06;
+					for (i = 0; i < 10; ++i) {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">U</text>`;
+						mtmp += `<text x="${x + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${i}</text>`;
+						mtmp += `<text x="${x + 0.035}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+						y += h;
+					}
+					x += w * 0.5;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+
+
+					x += w * 0.25;
+					mtmp += `<text x="${x}" y="0.5" font-size="0.09" fill="var(--g6bb)">=</text>`;
+
+
+
+
+					x += w * 0.65;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+					x += w * 0.35;
+					x2 = x + 0.325;
+					x3 = x2 + 0.25;
+					y = 0.06;
+
+					if (demo8_row_states[0] == 'initial') {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_left</text>`;
+					} else {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r0 = u_left</text>`;
+
+						mtmp += `<text x="${x2 - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">U</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${0}</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.035}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_left</text>`;
+					}
+					y += h;
+
+					for (i = 1; i < 9; ++i) {
+						if (demo8_row_states[i] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.01}" font-size="0.02" fill="var(--g6bb)">U</text>`;
+
+						} else if (demo8_row_states[i] == 'zerod') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon; &nbsp; - &alpha;  &nbsp; r${i - 1}</text>`;
+
+							mtmp += `<text x="${x - 0.08 + 0.03}" y="${y + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.08 + 0.03}" y="${y - 0.01}" font-size="0.02" fill="var(--g6bb)">U</text>`;
+
+							mtmp += `<text x="${x + 0.0125 + 0.03}" y="${y + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.0125 + 0.03}" y="${y - 0.01}" font-size="0.02" fill="var(--g6bb)">U</text>`;
+						} else if (demo8_row_states[i] == 'normed') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${i} = </text>
+						
+									<text x="${x}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&epsilon;${i}</text>
+									<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x} ${y - 0.01} l 0.14 0.0"></path>
+									<text x="${x + 0.04}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)"> - &alpha; &nbsp;  r${i - 1}</text> `;
+
+							mtmp += `<text x="${x + 0.05 + 0.03}" y="${y - 0.025 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.05 + 0.03}" y="${y - 0.025 - 0.01}" font-size="0.02" fill="var(--g6bb)">U</text>`;
+
+
+							mtmp += `<text x="${x + 0.04}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x + 0.04 + 0.03}" y="${y + 0.025 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.04 + 0.03}" y="${y + 0.025 - 0.01}" font-size="0.02" fill="var(--g6bb)">U</text>`;
+
+							mtmp += `<text x="${x2 - 0.0}" y="${y}" font-size="0.035" fill="var(--g6bb)">= r${i}</text>`;
+							mtmp += subscript(x2 - 0.08, y, 'U', 'n+1', i, '', 0.035);
+
+						}
+						y += h;
+					}
+					if (demo8_row_states[9] == 'initial') {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_right</text>`;
+					} else if (demo8_row_states[9] != 'back_sub') {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+					} else {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+
+						mtmp += subscript(x2 - 0.08, y, 'U', 'n+1', 9, '', 0.035);
+						mtmp += `<text x="${x2 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_right</text>`;
+					}
+					y += h;
+
+					x += w * 0.65;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+					demo8_contents.innerHTML = mtmp;
+
+					wait = 250;
+					if (demo8_next_state < demo8_transitions.length) {
+						id = demo8_transitions[demo8_next_state][0];
+						next_value = demo8_transitions[demo8_next_state][1];
+						demo8_row_states[id] = next_value;
+						demo8_next_state += 1;
+					} else {
+						for (i = 0; i < demo8_row_states.length; ++i) {
+							demo8_row_states[i] = 'initial';
+						}
+						demo8_next_state = 0;
+						wait = 2500;
+					}
+				}
+
+
+				var demo8b_contents = document.getElementById('demo8b_contents');
+				var demo8b_row_states = ['initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial', 'initial'];
+				var demo8b_transitions = [[9, 'zerod'],
+				[9, 'back_sub'],
+				[8, 'zerod'],
+				[8, 'back_sub'],
+				[7, 'zerod'],
+				[7, 'back_sub'],
+				[6, 'zerod'],
+				[6, 'back_sub'],
+				[5, 'zerod'],
+				[5, 'back_sub'],
+				[4, 'zerod'],
+				[4, 'back_sub'],
+				[3, 'zerod'],
+				[3, 'back_sub'],
+				[2, 'zerod'],
+				[2, 'back_sub'],
+				[1, 'zerod'],
+				[1, 'back_sub'],
+				[0, 'zerod'],
+				[0, 'back_sub'],
+				];
+				var demo8b_next_state = 0;
+
+				function demo8b_tick() {
+					rect = demo8b_contents.getBoundingClientRect();
+					viewHeight = document.documentElement.clientHeight;
+					if ((rect.bottom < 0 || rect.top - viewHeight >= 0) && !first_step) {
+						setTimeout(demo8b_tick, 500);
+						return;
+					}
+
+					mtmp = '';
+
+					row_states = demo8b_row_states;
+
+					//x=x0;y=0.06;w=0.1;h=0.1;
+					x = -0.4025; y = 0.06; w = 0.2; h = 0.1;
+
+					x += w * 0.7;
+					row_x_off = x;
+
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+					x += w;
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+
+					y += h;
+
+					for (i = 1; i < 9; ++i) {
+						x = row_x_off;
+						if (row_states[i] == 'initial') {
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">V</text>`;
+
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&gamma;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">V</text>`;
+
+						} else if (row_states[i] == 'zerod') {
+							x += w;
+							mtmp += `<text x="${x - 0.055}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x - 0.055 + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.055 + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">V</text>`;
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+						} else if (row_states[i] == 'normed') {
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y + 0.023}" font-size="0.025" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03}" y="${y - 0.023}" font-size="0.025" fill="var(--g6bb)">V</text>`;
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+
+						} else if (row_states[i] == 'back_sub') {
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+							x += w;
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">0</text>`;
+						}
+						row_x_off += w;
+						y += h;
+					}
+
+					x -= w;
+					x += w;
+					mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">1</text>`;
+
+					x += w * 0.2;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+					x += w * 0.3;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+
+					x += w * 0.0;
+					y = 0.06;
+					for (i = 0; i < 10; ++i) {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">V</text>`;
+						mtmp += `<text x="${x + 0.035}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${i}</text>`;
+						mtmp += `<text x="${x + 0.035}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+						y += h;
+					}
+					x += w * 0.5;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+					x += w * 0.25;
+					mtmp += `<text x="${x}" y="0.5" font-size="0.09" fill="var(--g6bb)">=</text>`;
+
+					x += w * 0.5;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l -0.02 0 l 0 1 l 0.02 0"></path>`;
+					x += w * 0.35;
+					x2 = x + 0.325;
+					x3 = x2 + 0.25;
+					y = 0.06;
+
+					if (row_states[0] == 'initial') {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_left</text>`;
+					} else {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r0 = u_left</text>`;
+
+						mtmp += `<text x="${x2 - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">V</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.03}" y="${y + 0.02}" font-size="0.03" fill="var(--g6bb)">${0}</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.03}" y="${y - 0.02}" font-size="0.03" fill="var(--g6bb)">n+1</text>`;
+						mtmp += `<text x="${x2 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_left</text>`;
+					}
+					y += h;
+
+					for (i = 1; i < 9; ++i) {
+						if (row_states[i] == 'initial') {
+							mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon;</text>`;
+							mtmp += `<text x="${x - 0.01 + 0.03}" y="${y + 0.0 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.01 + 0.03}" y="${y + 0.0 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+						} else if (row_states[i] == 'zerod') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.05" fill="var(--g6bb)">&epsilon;&nbsp; - &gamma;&nbsp; r${i + 1}</text>`;
+
+							mtmp += `<text x="${x - 0.09 + 0.03}" y="${y + 0.0 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.09 + 0.03}" y="${y + 0.0 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+
+							mtmp += `<text x="${x - 0.01 + 0.03}" y="${y + 0.0 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.01 + 0.03}" y="${y + 0.0 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+						} else if (row_states[i] == 'normed') {
+
+						} else if (row_states[i] == 'back_sub') {
+							mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${i} = </text>
+									<text x="${x}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)">&epsilon;&nbsp;</text>
+									<path stroke="var(--g6bb)" stroke-width="0.003" d="M ${x} ${y - 0.01} l 0.14 0.0"></path>
+									<text x="${x + 0.04}" y="${y - 0.025}" font-size="0.035" fill="var(--g6bb)"> - &gamma;&nbsp;  r${i + 1}</text> `;
+
+
+							mtmp += `<text x="${x + 0.05 + 0.03}" y="${y - 0.025 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.05 + 0.03}" y="${y - 0.025 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+
+							mtmp += `<text x="${x - 0.02 + 0.03}" y="${y - 0.025 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x - 0.02 + 0.03}" y="${y - 0.025 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+
+							mtmp += `<text x="${x + 0.04}" y="${y + 0.025}" font-size="0.035" fill="var(--g6bb)">&beta;</text>`;
+							mtmp += `<text x="${x + 0.03 + 0.03}" y="${y + 0.025 + 0.01}" font-size="0.02" fill="var(--g6bb)">${i}</text>`;
+							mtmp += `<text x="${x + 0.03 + 0.03}" y="${y + 0.025 - 0.01}" font-size="0.02" fill="var(--g6bb)">V</text>`;
+
+							mtmp += `<text x="${x2 - 0.0}" y="${y}" font-size="0.035" fill="var(--g6bb)">= r${i}</text>`;
+							mtmp += subscript(x2 - 0.08, y, 'V', 'n+1', i, '', 0.035);
+						}
+						y += h;
+					}
+					if (row_states[9] == 'initial') {
+						mtmp += `<text x="${x}" y="${y}" font-size="0.05" fill="var(--g6bb)">u_right</text>`;
+					} else if (row_states[9] != 'back_sub') {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+					} else {
+						mtmp += `<text x="${x - 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)">r${9} = u_right</text>`;
+
+						mtmp += subscript(x2 - 0.08, y, 'V', 'n+1', 9, '', 0.035);
+						mtmp += `<text x="${x2 - 0.08 + 0.08}" y="${y}" font-size="0.035" fill="var(--g6bb)"> = u_right</text>`;
+					}
+					y += h;
+
+					x += w * 0.65;
+					mtmp += `<path fill="none" stroke="var(--g6bb)" stroke-width="0.005" d="M ${x} 0 l 0.02 0 l 0 1 l -0.02 0"></path>`;
+
+					demo8b_contents.innerHTML = mtmp;
+
+					wait = 500;
+					if (demo8b_next_state < demo8b_transitions.length) {
+						id = demo8b_transitions[demo8b_next_state][0];
+						next_value = demo8b_transitions[demo8b_next_state][1];
+						row_states[id] = next_value;
+						demo8b_next_state += 1;
+					} else {
+						for (i = 0; i < demo8_row_states.length; ++i) {
+							demo8b_row_states[i] = 'initial';
+						}
+						demo8b_next_state = 0;
+					}
+
+					demo8_tick();
+					setTimeout(demo8b_tick, wait);
+				}
+				demo8b_tick();
+
+			</script>
+
+
+			<p>
+				<br /><br />
+				The equations for \(U^{n+1}\) and \(V^{n+1}\) can be solved independently, leading to an opportunity to
+				parallelise this stage.
+
+				Everything starts from the same point, so the initial conditions for \(U\) and \(V\) are given by
+				\(U^{0}_{i} = u^{0}_{i}\)
+				and \(V^{0}_{i} = u^{0}_{i}\). At each time-step thereafter, the values for \(U^{n}\) and \(V^{n}\) can
+				be reset to
+				the newly calculated value \(u^{n+1}\). This is controlled by
+				a linear combination of the old and new values given by
+				the BCTY resetting parameter \( \chi \) in the above,
+				\[
+				U^{n}_{\text{new time-step}} = \chi u^{n+1}_{\text{last time-step}} + (1 - \chi) U^{n+1}_{\text{last
+				time-step}},
+				\qquad V^{n}_{\text{new time-step}} = \chi u^{n+1}_{\text{last time-step}} + (1 - \chi)
+				V^{n+1}_{\text{last time-step}},
+				\qquad (0 \le \chi \le 1).
+				\]
+				At \(\chi=1\), we will have \(U^{n} = u^{n}\) and \(V^{n} = u^{n}\) before solving for \(U^{n+1}\)
+				and \(V^{n+1}\), while at \(\chi=0\) we have \(U^{n} = U^{n}\) and \(V^{n} = V^{n}\) from the last
+				time-step.
+				Stability changes to the method have been observed depending on whether or not resetting is used.
+				<br /><br />
+			</p>
+
+			<h3>Further reading</h3>
+
+			<p>
+				<br />
+				<span style="font-size:0.85em">For the basics of solving partial differential equations analytically
+				</span>
+				<li style="margin-left:2em">
+					Constanda, C. (2023)
+					<i>Solution Techniques for Elementary Partial Differential Equations, 4th-ed.</i>
+					CRC Press
+				</li>
+
+				<span style="font-size:0.85em">For an introduction to numerical methods for general partial differential
+					equations</span>
+				<li style="margin-left:2em">
+					Iserles, A. (1996)
+					<i>A First Course in the Numerical Analysis of Differential Equations.</i>
+					Camrbidge Univserity Press
+				</li>
+
+				<span style="font-size:0.85em">For numerical solutions of PDEs within a financial context and an
+					introduction to the ADE method </span>
+				<li style="margin-left:2em">
+					Duffy, D. J. (2022)
+					<i>Numerical Methods in Computational Finance: A Partial Differential Equation (PDE/FDM)
+						Approach.</i>
+					John Wiley & Sons
+				</li>
+
+				<span style="font-size:0.85em">For more general numerical methods </span>
+				<li style="margin-left:2em"> Gerald, C. F. and Wheatley, P. O. (2006)
+					<i>Applied Numerical Analysis, 6th-ed.</i>
+					Addison-Wesley
+				</li>
+
+				<span style="font-size:0.85em">For the numerical solutions of different types of linear systems</span>
+				<li style="margin-left:2em">
+					Golub, G. H. and Van Loan, C. F. (2013)
+					<i>Matrix Computations, 4th-ed.</i>
+					John Hopkins University
+				</li>
+			</p>
+
+			<br /><br />
+		</div>
+
+
+	</div>
+
+	<script type="text/javascript">
+
+		tick();
+
+
+		var graph6_pointer = document.getElementById('graph6_pointer');
+		graph6.addEventListener('mousemove', (evt) => {
+			sx = evt.clientX - graph6.getClientRects()[0].x;
+			x1 = sx / graph6.getClientRects()[0].width;
+
+			pdx = 1.0 / (demo.NX - 1);
+			i = Math.floor(x1 / pdx);
+			marker_post = i;
+
+			graph6_pointer.setAttribute('cx', i * pdx);
+			yx = 0.92 - 0.85 * (u[marker_post] - last_y_min) / (last_y_max - last_y_min);
+			graph6_pointer.setAttribute('cy', yx);
+
+
+			marker_post_x = demo.xleft + (marker_post / (demo.NX - 1)) * (demo.xright - demo.xleft);
+			graph6_bl_text.innerHTML = `t=${Math.round(demo.t * 100.0) / 100.0}, x=${Math.round(marker_post_x * 10000.0) / 10000.0}, BCTY u=${Math.round(u[marker_post] * 10000.0) / 10000.0}, BTCS u=${Math.round(u_be[marker_post] * 10000.0) / 10000.0}`;
+
+		});
+
+
+
+
+	</script>
+
+</body>
+
+</html>
