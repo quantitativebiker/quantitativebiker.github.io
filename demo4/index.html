@@ -710,11 +710,17 @@
 				let d2 = d1 - sigma * Math.sqrt(T);
 
 				let pv = S * approx_cdf(d1) - Math.exp(-r * T) * K * approx_cdf(d2);
+				pv = (pv === pv) ? pv : 0;
 				let delta = approx_cdf(d1);
+				delta = (delta === delta) ? delta : 0;
 				let gamma = approx_d_cdf(d1) / (S * sigma * Math.sqrt(T));
+				gamma = (gamma === gamma) ? gamma : 0;
 				let theta = -S * approx_d_cdf(d1) * sigma / (2.0 * Math.sqrt(T)) - r * K * Math.exp(-r * T) * approx_cdf(d2);
+				theta = (theta === theta)? theta : 0;
 				let vega = S * Math.sqrt(T) * approx_d_cdf(d1);
+				vega = (vega === vega) ? vega: 0;
 				let rho = K * T * Math.exp(-r * T) * approx_cdf(d2);
+				rho = (rho === rho) ? rho : 0;
 				return { pv, delta, gamma, theta, vega, rho };
 			}
 
@@ -723,11 +729,17 @@
 				let d2 = d1 - sigma * Math.sqrt(T);
 
 				let pv = -S * approx_cdf(-d1) + Math.exp(-r * T) * K * approx_cdf(-d2);
+				pv = (pv === pv) ? pv : 0;
 				let delta = approx_cdf(d1) - 1.0;
+				delta = (delta === delta) ? delta : 0;
 				let gamma = approx_d_cdf(d1) / (S * sigma * Math.sqrt(T));
+				gamma = (gamma === gamma) ? gamma : 0;
 				let theta = -S * approx_d_cdf(d1) * sigma / (2.0 * Math.sqrt(T)) + r * K * Math.exp(-r * T) * approx_cdf(-d2);
+				theta = (theta === theta) ? theta : 0;
 				let vega = S * Math.sqrt(T) * approx_d_cdf(d1);
+				vega = (vega === vega) ? vega : 0;
 				let rho = -K * T * Math.exp(-r * T) * approx_cdf(-d2);
+				rho = (rho === rho) ? rho : 0;
 				return { pv, delta, gamma, theta, vega, rho };
 			}
 
