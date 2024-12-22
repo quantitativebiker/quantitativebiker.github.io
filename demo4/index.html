@@ -1128,7 +1128,7 @@
 						shopping_basket.innerHTML += `<br/>Short ${-S_hedge} of underlying asset`;
 					}
 				}
-				shopping_basket.innerHTML += `<br/><br/><span style="font-size:0.5em;">Note - in many assets the contract size will be 100x of the asset, you may have to adjust your calculations accordingly. A single call or put option here assumed to be for 1 quantity of the underlying asset.</span>`;
+				shopping_basket.innerHTML += `<br/><br/><span style="font-size:0.5em;">Note - in many assets the contract size will be 100x of the asset, you may have to adjust your calculations accordingly. A single call or put option here is assumed to be for 1 quantity of the underlying asset.</span>`;
 
 				for (rescale_itr = 0; rescale_itr < 2; rescale_itr++) { // do a dry-run for axis scaling
 					let S = Smin;
@@ -1347,7 +1347,7 @@
 						zero_wait -= 1;
 					}
 					if (tick_T < 0 && zero_wait == 0) {
-						//tick_T = bs_T_target;
+						tick_T = bs_T_target;
 						zero_wait = 10;
 					}
 					bs_T.value = tick_T;

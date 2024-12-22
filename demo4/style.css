@@ -109,3 +109,7 @@ input:hover{
 select:hover{
     cursor: pointer;
 }
+
+input[type='range']{
+ accent-color:#333;
+}
