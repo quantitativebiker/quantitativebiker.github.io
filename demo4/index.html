@@ -1,0 +1,1987 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+	</script>
+
+	<style>
+		:root {
+			color-scheme: dark light;
+			--col1: #EEE9D5;
+			--col2: #9FBEB8;
+			--col3: #6B7FD7;
+			--col4: #BDEDF6;
+			--col5: #0E1C27;
+
+			--grid_border: light-dark(#222, #ddd);
+			--g6bb: light-dark(#000, #ddd);
+			--gbt: light-dark(#333, #ddd);
+			--gbbg: light-dark(#fff, #000);
+			--cgbbg: light-dark(#000, #fff);
+
+			--cgbbg_itm: light-dark(#000, #fff);
+			--cgbbg_select: light-dark(#3c7, #00f);
+
+			--bg1: light-dark(#eeeeee, #000);
+			--bg2: light-dark(#dddddd, #333);
+
+			--path1: light-dark(#000f, #dddf);
+			--wrapper_bg: light-dark(#fff, #000);
+
+			--col_snowflake: light-dark(#fff,#000);
+
+			--pv_plt: light-dark(#000,#fff);
+			--delta_plt: light-dark(#e8be34,#e8be34);
+			--gamma_plt: light-dark(#da4f4f,#da4f4f);
+			--theta_plt: light-dark(#3b5f29,#7deb45);
+			--rho_plt: light-dark(#b040c4,#b040c4);
+			--vega_plt: light-dark(#50a1d3,#50a1d3);
+
+			--pointer_plt: light-dark(#1f1d1d, #989898);
+		}
+	</style>
+
+	<link rel="stylesheet" type="text/css" href="./style.css" />
+
+</head>
+
+<body>
+
+	<div id="big_wrapper">
+
+		<div style="display:table; width:100%; padding-bottom: 0.5em;">
+			<h5 style="float:left; color:#c04; cursor: pointer;"> &nbsp; &lt; <a href="..">Other demos</a> </h5>
+			<h4 style="float:right;"> Black Scholes and the Greeks for common trading strategies</h4>
+		</div>
+
+		<div style="margin:auto;vertical-align:middle;
+		display:grid; grid-template-columns: repeat(2, 1fr); ">
+
+			<div style="grid-column: 1; " id="fudge">
+				<div id="layout1" style="display:none; position:relative; width: 30em;">
+					<svg onmousemove="cursormove(evt)" style="width:100%;height:100%;" viewBox="-0.0 -0.0 1.0 1.0"
+						xmls="http://www.w3.org/2000/svg">
+						
+						<g id="graph_bs_all"></g>
+						<circle id="graph_pointer_all" cx="-10" cy="0" r="0.002" fill="red" stroke="none"></circle>
+						<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+							d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+						<path id="pointer_line0" fill="none" stroke="#989898" stroke-width="0.0005"
+							d="M 0.5,0 L .5,1" />
+						<path id="strike_line0_1" fill="none" stroke="green" stroke-width="0.0015"
+							d="M 0.5,0 L .5,1" />
+						<path id="strike_line0_2" fill="none" stroke="green" stroke-width="0.0015"
+							d="M 0.5,0 L .5,1" />
+						<path id="strike_line0_3" fill="none" stroke="green" stroke-width="0.0015"
+							d="M 0.5,0 L .5,1" />
+						<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+							d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+						<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+							d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+							<circle id="strike_ptr0" cx="-10" cy="0" r="0.005" fill="green" stroke="none"></circle>
+							<circle id="strike_ptr1" cx="-10" cy="0" r="0.005" fill="green" stroke="none"></circle>
+							<circle id="strike_ptr2" cx="-10" cy="0" r="0.005" fill="green" stroke="none"></circle>
+
+							<text class="tick_s_0" x="0.02" y="0.5599" font-size="0.023" fill="var(--g6bb)">0</text>
+							<text class="tick_s_2" x="0.2" y="0.5599" font-size="0.023" fill="var(--g6bb)">0.25</text>
+							<text class="tick_s_4" x="0.4" y="0.5599" font-size="0.023" fill="var(--g6bb)">0.4</text>
+							<text class="tick_s_6" x="0.6" y="0.5599" font-size="0.023" fill="var(--g6bb)">0.6</text>
+							<text class="tick_s_7" x="0.8" y="0.5599" font-size="0.023" fill="var(--g6bb)">0.75</text>
+							<text class="tick_s_1" x="0.97" y="0.5599" font-size="0.023" fill="var(--g6bb)">1</text>
+							<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+					</svg>
+
+					<div style="position:absolute; bottom:0.0em; right:0.5em; padding-left:0.5em; padding-right:0.5em; 
+					background-color: var(--gbbg); border-radius: 0.5em; 
+					border:var(--cgbbg) 1px solid;">
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="pv_visible=!pv_visible;
+						bs_calc_update();">
+							<path id="pv_legend" fill="#00f" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;" onclick="pv_visible=!pv_visible;
+						bs_calc_update();">Present value</label>
+
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="delta_visible=!delta_visible;
+						bs_calc_update();">
+							<path id="delta_legend" fill="#f00" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;" onclick="delta_visible=!delta_visible;
+						bs_calc_update();">Delta</label>
+
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="gamma_visible=!gamma_visible;
+						bs_calc_update();">
+							<path id="gamma_legend" fill="#f00" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;" 
+						onclick="gamma_visible=!gamma_visible;
+						bs_calc_update();">Gamma</label>
+
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="vega_visible=!vega_visible;
+						bs_calc_update();">
+							<path id="vega_legend" fill="#f00" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;"
+						onclick="vega_visible=!vega_visible;
+						bs_calc_update();">Vega</label>
+
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="theta_visible=!theta_visible;
+						bs_calc_update();">
+							<path id="theta_legend" fill="#f00" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;" onclick="theta_visible=!theta_visible;
+						document.getElementById('theta_legend').setAttribute('fill', theta_visible?'#f00':'#ccc');
+						bs_calc_update();">Theta</label>
+
+						<svg style="height:0.5em;cursor: pointer;" viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg"
+						onclick="rho_visible=!rho_visible;
+						bs_calc_update();">
+							<path id="rho_legend" fill="#f00" stroke="none" d="M 0,0
+						L 1,0
+						L 1,1
+						L 0,1
+						z" />
+						</svg>
+						<label style="cursor: pointer;" onclick="rho_visible=!rho_visible;
+						bs_calc_update();">Rho</label>
+					</div>
+				</div>
+
+				<div id="layout2" style="display:inline-block; width: 30em;">
+					<div style="display:grid; grid-template-columns: repeat(3, 1fr);">
+						<div style="grid-column: 1 / 3; grid-row: 1 / 3; position: relative; ">
+							<svg onmousemove="cursormove(evt)" style="width:100%;height:100%;"
+								viewBox="-0.0 -0.0 1.0 1.0" xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs1_contents"></g>
+								<circle id="graph1_pointer" cx="-10" cy="0" r="0.015" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.0015"
+									d="M 0,0 L 1,0 L 1,1 L 0,1 z" />
+								<path id="strike_line1_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line1_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line1_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0.05,.1 L .7,.1 L .7,0.025 L 0.05,0.025 z" />
+								<text x="0.025" y="0.07" font-size="0.04" fill="var(--g6bb)">Present day portfolio value
+									V(S ;
+									T,K,&sigma;,r)</text>
+
+							</svg>
+							<!-- h3 style="position:absolute;top:0.5em;left:0.5em;">V(S ; K,T,&sigma;,r)</h3 -->
+						</div>
+
+						<div style="grid-column: 3/4; grid-row: 1; position: relative; padding-left:0.5em;">
+							<svg onmousemove="cursormove(evt)" viewBox="-0.0 -0.0 1.0 1.0"
+								xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs2_contents"></g>
+								<circle id="graph2_pointer" cx="-10" cy="0" r="0.02" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+									d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+								<path id="strike_line2_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line2_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line2_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+								<text x="0.025" y="0.07" font-size="0.06" fill="var(--g6bb)">Delta =
+									&#x2202;V/&#x2202;S</text>
+
+								<text class="tick_s_0" x="0.0" y="0.99" font-size="0.06" fill="var(--g6bb)">0</text>
+								<text class="tick_s_2" x="0.2" y="0.99" font-size="0.06" fill="var(--g6bb)">0.25</text>
+								<text class="tick_s_4" x="0.4" y="0.99" font-size="0.06" fill="var(--g6bb)">0.4</text>
+								<text class="tick_s_6" x="0.6" y="0.99" font-size="0.06" fill="var(--g6bb)">0.6</text>
+								<text class="tick_s_7" x="0.8" y="0.99" font-size="0.06" fill="var(--g6bb)">0.8</text>
+								<text class="tick_s_1" x="0.97" y="0.99" font-size="0.06" fill="var(--g6bb)">1</text>
+								<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+							</svg>
+						</div>
+
+						<div style="grid-column: 3/4; grid-row: 2; position: relative; padding-left:0.5em;">
+							<svg onmousemove="cursormove(evt)" viewBox="-0.0 -0.0 1.0 1.0"
+								xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs3_contents"></g>
+								<circle id="graph3_pointer" cx="-10" cy="0" r="0.02" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+									d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+								<path id="strike_line3_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line3_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line3_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+								<text x="0.025" y="0.07" font-size="0.06" fill="var(--g6bb)">Gamma =
+									&#x2202;2V/&#x2202;S2</text>
+
+								<text class="tick_s_0" x="0.0" y="0.99" font-size="0.06" fill="var(--g6bb)">0</text>
+								<text class="tick_s_2" x="0.2" y="0.99" font-size="0.06" fill="var(--g6bb)">0.25</text>
+								<text class="tick_s_4" x="0.4" y="0.99" font-size="0.06" fill="var(--g6bb)">0.4</text>
+								<text class="tick_s_6" x="0.6" y="0.99" font-size="0.06" fill="var(--g6bb)">0.6</text>
+								<text class="tick_s_7" x="0.8" y="0.99" font-size="0.06" fill="var(--g6bb)">0.8</text>
+								<text class="tick_s_1" x="0.97" y="0.99" font-size="0.06" fill="var(--g6bb)">1</text>
+								<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+							</svg>
+						</div>
+
+						<div style="grid-column:1; position: relative; padding-left:0.5em;">
+							<svg onmousemove="cursormove(evt)" viewBox="-0.0 -0.0 1.0 1.0"
+								xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs4_contents"></g>
+								<circle id="graph4_pointer" cx="-10" cy="0" r="0.02" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+									d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+								<path id="strike_line4_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line4_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line4_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+								<text x="0.025" y="0.07" font-size="0.06" fill="var(--g6bb)">Vega =
+									&#x2202;V/&#x2202;&sigma;</text>
+
+								<text class="tick_s_0" x="0.0" y="0.99" font-size="0.06" fill="var(--g6bb)">0</text>
+								<text class="tick_s_2" x="0.2" y="0.99" font-size="0.06" fill="var(--g6bb)">0.25</text>
+								<text class="tick_s_4" x="0.4" y="0.99" font-size="0.06" fill="var(--g6bb)">0.4</text>
+								<text class="tick_s_6" x="0.6" y="0.99" font-size="0.06" fill="var(--g6bb)">0.6</text>
+								<text class="tick_s_7" x="0.8" y="0.99" font-size="0.06" fill="var(--g6bb)">0.8</text>
+								<text class="tick_s_1" x="0.97" y="0.99" font-size="0.06" fill="var(--g6bb)">1</text>
+								<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+							</svg>
+						</div>
+
+						<div style="grid-column:2; position: relative; padding-left:0.5em;">
+							<svg onmousemove="cursormove(evt)" viewBox="-0.0 -0.0 1.0 1.0"
+								xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs5_contents"></g>
+								<circle id="graph5_pointer" cx="-10" cy="0" r="0.02" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+									d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+								<path id="strike_line5_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line5_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line5_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+								<text x="0.025" y="0.07" font-size="0.06" fill="var(--g6bb)">Rho =
+									&#x2202;V/&#x2202;r</text>
+
+								<text class="tick_s_0" x="0.0" y="0.99" font-size="0.06" fill="var(--g6bb)">0</text>
+								<text class="tick_s_2" x="0.2" y="0.99" font-size="0.06" fill="var(--g6bb)">0.25</text>
+								<text class="tick_s_4" x="0.4" y="0.99" font-size="0.06" fill="var(--g6bb)">0.4</text>
+								<text class="tick_s_6" x="0.6" y="0.99" font-size="0.06" fill="var(--g6bb)">0.6</text>
+								<text class="tick_s_7" x="0.8" y="0.99" font-size="0.06" fill="var(--g6bb)">0.8</text>
+								<text class="tick_s_1" x="0.97" y="0.99" font-size="0.06" fill="var(--g6bb)">1</text>
+								<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+							</svg>
+						</div>
+
+						<div style="grid-column:3; position: relative; padding-left:0.5em;">
+							<svg onmousemove="cursormove(evt)" viewBox="-0.0 -0.0 1.0 1.0"
+								xmls="http://www.w3.org/2000/svg">
+								<g id="graph_bs6_contents"></g>
+								<circle id="graph6_pointer" cx="-10" cy="0" r="0.02" fill="var(--pointer_plt)" stroke="none"></circle>
+								<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+									d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+								<path id="strike_line6_1" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line6_2" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path id="strike_line6_3" fill="none" stroke="green" stroke-width="0.0015"
+									d="M 0.5,0 L .5,1" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+								<path fill="var(--gbbg)" stroke="none" stroke-width="0"
+									d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
+
+								<text x="0.6" y="0.07" font-size="0.06" fill="var(--g6bb)">Theta =
+									&#x2202;V/&#x2202;&tau;</text>
+
+								<text class="tick_s_0" x="0.0" y="0.99" font-size="0.06" fill="var(--g6bb)">0</text>
+								<text class="tick_s_2" x="0.2" y="0.99" font-size="0.06" fill="var(--g6bb)">0.25</text>
+								<text class="tick_s_4" x="0.4" y="0.99" font-size="0.06" fill="var(--g6bb)">0.4</text>
+								<text class="tick_s_6" x="0.6" y="0.99" font-size="0.06" fill="var(--g6bb)">0.6</text>
+								<text class="tick_s_7" x="0.8" y="0.99" font-size="0.06" fill="var(--g6bb)">0.8</text>
+								<text class="tick_s_1" x="0.97" y="0.99" font-size="0.06" fill="var(--g6bb)">1</text>
+								<!-- text x="0.5" y="0.99" font-size="0.06" fill="var(--g6bb)">S</text -->
+
+							</svg>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div style="grid-column:2; ">
+				<div style="display:grid; padding-left: 0.5em;
+			grid-template-columns: 2fr 3fr 1.25fr;">
+
+					<label style="grid-column: 1;padding-right:.3em;">Single plot</label>
+					<label style="grid-column: 2;" id="default_label"></label>
+					<input style="grid-column: 3;" type="checkbox" id="one_plot" onchange="
+						if (!event.target.checked) {
+							document.getElementById('layout1').style.display = 'none';
+							document.getElementById('layout2').style.display = 'inline-block';
+						} else {
+							document.getElementById('layout1').style.display = 'inline-block';
+							document.getElementById('layout2').style.display = 'none';
+						}
+
+						bs_calc_update();" />
+
+					<label style="grid-column: 1;padding-right:.3em;">Normalise axis</label>
+					<label style="grid-column: 2;" id="default_label"></label>
+					<input style="grid-column: 3;" type="checkbox" id="bs_scale_axis" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" />
+
+					<label style="grid-column: 1;padding-right:.3em;">Large S</label>
+					<label style="grid-column: 2;"> (S of order 100)</label>
+					<input style="grid-column: 3;" type="checkbox" id="big_numbers" onchange="
+						bs_calc_update();" onmousemove="bs_calc_update();" />
+
+					<label style="grid-column: 1;padding-right:.3em;">Strategy</label>
+					<div style="grid-column: 2;">
+						<select onchange="bs_calc_update();" onmousemove="bs_calc_update();" id="bs_strategy">
+							<option blurb="A call option entitles the holder to purchase the asset for price K at time T.">
+								Call</option>
+							<option
+								blurb="A put option entitles the holder to sell the asset for price K at time T.">
+								Put</option>
+							<option class="requires_K2 requires_K3"
+								blurb="A butterfly spread is made up of 4 call options over 3 different strikes typically spread out uniformly. Two call options will be sold at the middle strike, and call options will be bought at each of the other two strikes. This strategy assumes that the asset price will not deviate far from the middle strike. ">
+								Butterfly spread</option>
+							<option class="requires_K2"
+								blurb="A risk reversal is made up of the purchase of one call option and the sale of one put option. The strategy is typically set up so that the sale of the put will fund the purchase of the call. In this way there is upward exposure to the underlying asset without putting ones own money in. Note there is also downside exposure if the asset price should fall.">
+								Risk reversal</option>
+							<option class="requires_K2"
+								blurb="A bull spread is made up of the purchase of one call option and the sale of another call option at a higher strike. This limits the potential upward gains from the asset price increasing but will be less expensive than buying the same uncapped call option.">
+								Bull spread</option>
+							<option class="requires_K2"
+								blurb="A bear spread is the opposite of a bull spread. This is made up of the purchase of a put and the sale of another put with a lower strike. Effectively this strategy will be in profit as the asset price decreases but has limited profit and loss features much like the bull spread.">
+								Bear spread</option>
+							<option 
+								blurb="A strip is made up of one call option and two put options with the same strike price and expiration. This strategy assumes that the asset price will move away from the strike but with a slight bias towards the asset price decreasing.">
+								Strip</option>
+							<option 
+								blurb="A strap is similar to a strip but comprises of two call options and one put option with the same strike price and expiration. This strategy assumes that the asset price will move away from the strike but with a slight bias towards the asset price increasing.">
+								Strap</option>
+							<option
+								blurb="A straddle is made up of the purchase of one call option and one put option both of which have the same strike. The strike is usually chosen to be close to the current asset price. This strategy assumes that the asset price will move away from this value, although with no view on which direction the price will move.">
+								Straddle</option>
+							<option class="requires_K2"
+								blurb="A strangle is, like the straddle, made up of the purchase of a call option and a put option but the strikes are allowed to differ. This will be cheaper than a straddle to fund because the asset price will have to move much further before the strategy becomes profitable.">
+								Strangle</option>
+							<option selected class="requires_K2 requires_K3"
+								blurb="The Christmas Tree strategy is made up of 6 call options, 3 of which are sold and 3 of which are bought. This strategy has limited profit and loss features and is similar to the butterfly spread but there is a slight directional bias. If the strategy is centred on the current asset price, then the holder is expecting the price not to move much, but if it does move, they expect it to be more likely to increase slightly than decrease.
+<br/><br/>The strategy is named for its resemblance to a Christmas Tree at expiry. If you really squint your eyes...">
+								Christmas Tree</option>
+						</select>
+					</div>
+
+					<label style="grid-column: 1;padding-right:.3em;">Position</label>
+					<div style="grid-column: 2/4;">
+						<input id="bs_position_buy" name="bs_position_group" type="radio" onchange="bs_calc_update();"
+							style="padding-left:0.1em;padding-right:0.5em;" checked>Buy</input>
+						<input id="bs_position_sell" name="bs_position_group" type="radio" onchange="bs_calc_update();"
+							style="padding-left:0.1em;padding-right:0.5em;">Sell</input>
+					</div>
+
+					<label class="snowflakes_opt" style="grid-column: 1;padding-right:.3em;">Snowflakes</label>
+					<label class="snowflakes_opt" style="grid-column: 2;">  </label>
+					<input class="snowflakes_opt" style="grid-column: 3;" type="checkbox" id="snowflakes_cb" onchange="bs_calc_update();" onmousemove="bs_calc_update();" checked />
+
+					<h3 style="grid-column: 1/4;">
+						<br />
+						Details
+					</h3>
+
+					<div h3 style="grid-column: 1/4;" id="details_blurb">
+						...
+					</div>
+
+					<h3 style="grid-column: 1/4;">
+						<br />
+						Strategy Parameters
+					</h3>
+
+					<label style="grid-column: 1; padding-right:.3em;">Expiry T</label>
+					<div style="grid-column: 2;">
+						<img src="./player-play-filled.svg" width="14px" height="14px" id="play_btn" onclick="
+						play_state=play_state=='play'?'stop':'play';
+						event.target.setAttribute('src', play_state=='play'?'./player-pause-filled.svg':'./player-play-filled.svg');
+						bs_T_target=Number(bs_T.value);
+						tick_T=bs_T_target;
+						" style="cursor: pointer;" />
+						<input style="grid-column: 2;" type="range" id="bs_T" onchange="bs_calc_update();
+					play_state='stop';
+					document.getElementById('play_btn').setAttribute('src', play_state=='play'?'./player-pause-filled.svg':'./player-play-filled.svg');"
+							onmousemove="bs_calc_update();" onmousedown="
+					play_state='stop';
+					document.getElementById('play_btn').setAttribute('src', './player-play-filled.svg');"
+							min="0.0" max="10.0" step="0.001" value="1.0" />
+					</div>
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_T_label"> 10.0 </label>
+
+					<label style="grid-column: 1;padding-right:.3em;">Strike K</label>
+					<input style="grid-column: 2;" type="range" id="bs_K" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" min="0.01" max="3" step="0.01" value="0.2" />
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_K_label"> 10.0 </label>
+
+					<label style="grid-column: 1; padding-right:.3em;" class="strike2">Strike K2</label>
+					<input style="grid-column: 2;" type="range" id="bs_K2" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" min="0.01" max="3" step="0.01" value="0.6"class="strike2" />
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_K2_label" class="strike2"> 10.0 </label>
+
+					<label style="grid-column: 1; padding-right:.3em;" class="strike3">Strike K3</label>
+					<input style="grid-column: 2;" type="range" id="bs_K3" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" min="0.01" max="3" step="0.01" value="0.8" class="strike3" />
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_K3_label" class="strike3"> 10.0 </label>
+
+					<label style="grid-column: 1;padding-right:.3em;">Rate r</label>
+					<input style="grid-column: 2;" type="range" id="bs_r" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" min="0" max="0.5" step="0.0001" value="0.05" />
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_r_label"> 10.0 </label>
+
+					<label style="grid-column: 1; padding-right:.3em;">Volatility &sigma;</label>
+					<input style="grid-column: 2;" type="range" id="bs_sigma" onchange="bs_calc_update();"
+						onmousemove="bs_calc_update();" min="0.01" max="2.0" step="0.01" value="0.1" />
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_sigma_label"> 10.0 </label>
+
+
+					<h3 style="grid-column: 1/4;">
+						<br />
+						Portfolio Parameters
+					</h3>
+
+					<label style="grid-column: 1; padding-right:.3em;"> Premium offset</label>
+					<div style="grid-column: 2;">
+						<img src="./restore.svg" width="14px" height="14px" onclick="bs_v_off.value=0;bs_calc_update();"
+							style="cursor: pointer;" />
+						<input type="range" id="bs_v_off" onchange="bs_calc_update();" onmousemove="bs_calc_update();"
+							min="-3" max="3" value="0" step="0.01" />
+					</div>
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_v_off_label"> 10.0 </label>
+
+					<label style="grid-column: 1; padding-right:.3em;">Delta hedge</label>
+					<div style="grid-column: 2;">
+						<img src="./restore.svg" width="14px" height="14px" onclick="bs_S_hedge.value=0;bs_calc_update();"
+							style="cursor: pointer;" />
+						<input style="grid-column: 2;" type="range" id="bs_S_hedge" onchange="bs_calc_update();"
+							onmousemove="bs_calc_update();" min="-3" max="3" value="0" step="0.01" />
+					</div>
+					<label style="grid-column: 3;margin-left:0.5em;" id="bs_S_hedge_label"> 10.0 </label>
+
+					<h3 style="grid-column: 1/4;">
+						<br />
+						Pointer
+					</h3>
+
+					<label style="grid-column: 1; padding-right:.3em; color:var(--pointer_plt);">Asset price S</label>
+					<input style="grid-column: 2;" type="range" id="bs_St0" onchange="
+					console.log('onchange val=', event.target.value);
+							marker_post = Math.floor(Number(event.target.value) / dx);
+							bs_calc_update();" onmousemove="
+							marker_post = Math.floor(Number(event.target.value) / dx);
+							bs_calc_update();" min="0.01" max="1.1" step="0.01" />
+					<label style="grid-column: 3;margin-left:0.5em; color:var(--pointer_plt);" id="result_s"> 10.0 </label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--pv_plt);">Present value</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--pv_plt);" id="result_pv">Present value</label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--delta_plt);">Delta</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--delta_plt);" id="result_delta">Delta</label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--gamma_plt);">Gamma</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--gamma_plt);" id="result_gamma">gamma</label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--vega_plt);">Vega</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--vega_plt);" id="result_vega">vega</label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--rho_plt);">Rho</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--rho_plt);" id="result_rho">rho</label>
+
+					<label style="grid-column: 1/3; padding-right:.3em; color:var(--theta_plt);">Theta</label>
+					<label style="grid-column: 3; padding-right:.3em; color:var(--theta_plt);" id="result_theta">theta</label>
+
+					<h3 style="grid-column: 1/4;">
+						<br />
+						Shopping basket
+					</h3>
+					<p id="shopping_basket" style="grid-column: 1/4;">shopping_basket</p><br />
+
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+
+			const NX = 128;
+			const dx = 1.0 / (NX - 1);
+			let marker_post = NX >> 1;
+
+			let graph_bs_all_contents = document.getElementById('graph_bs_all_contents');
+			let graph_bs_all = document.getElementById('graph_bs_all');
+			let shopping_basket = document.getElementById('shopping_basket');
+
+			let graph_bs1 = document.getElementById('graph_bs1');
+			let graph_bs2 = document.getElementById('graph_bs2');
+			let graph_bs3 = document.getElementById('graph_bs3');
+			let graph_bs4 = document.getElementById('graph_bs4');
+			let graph_bs5 = document.getElementById('graph_bs5');
+			let graph_bs6 = document.getElementById('graph_bs6');
+
+			let graph_pointer_all = document.getElementById('graph_pointer_all');
+			let pointer_line0 = document.getElementById('pointer_line0');
+
+			let graph1_pointer = document.getElementById('graph1_pointer');
+			let graph2_pointer = document.getElementById('graph2_pointer');
+			let graph3_pointer = document.getElementById('graph3_pointer');
+			let graph4_pointer = document.getElementById('graph4_pointer');
+			let graph5_pointer = document.getElementById('graph5_pointer');
+			let graph6_pointer = document.getElementById('graph6_pointer');
+
+			let result_s = document.getElementById('result_s');
+			let result_pv = document.getElementById('result_pv');
+			let result_delta = document.getElementById('result_delta');
+			let result_gamma = document.getElementById('result_gamma');
+			let result_theta = document.getElementById('result_theta');
+			let result_vega = document.getElementById('result_vega');
+			let result_rho = document.getElementById('result_rho');
+
+			function cursormove(evt) {
+				component = evt.target;
+				if (component.tagName != 'svg' && component.tagName != 'SVG') { return; }
+				sx = evt.clientX - component.getClientRects()[0].x;
+				x1 = sx / component.getClientRects()[0].width;
+				marker_post = Math.floor(x1 / dx);
+				bs_calc_update();
+			}
+
+			function erf(x) { // handbook of mathematical formula (error < 1e-7)
+				const t = 1.0 / (1.0 + 0.3275911 * x);
+				return 1.0 - (0.254829592 * t + -0.284496736 * t * t + 1.421413741 * t * t * t + -1.453152027 * t * t * t * t + 1.061405429 * t * t * t * t * t) * Math.exp(-x * x);
+			}
+
+			function approx_cdf(x) {
+				if (x < 0) {
+					return 0.5 - 0.5 * erf(-x * 0.7071067811865475);
+				} else {
+					return 0.5 + 0.5 * erf(x * 0.7071067811865475);
+				}
+			}
+
+			function approx_d_cdf(x) {
+				return 0.3989422804014327 * Math.exp(-x * x * 0.5);
+			}
+
+			let pv_visible = true;
+			let delta_visible = true;
+			let gamma_visible = true;
+			let theta_visible = false;
+			let rho_visible = false;
+			let vega_visible = true;
+
+			let bs_position_sell = document.getElementById('bs_position_sell');
+			let bs_position_buy = document.getElementById('bs_position_buy');
+
+			let bs_scale_axis = document.getElementById('bs_scale_axis');
+			let bs_strategy = document.getElementById('bs_strategy');
+			let bs_K = document.getElementById('bs_K');
+			let bs_K2 = document.getElementById('bs_K2');
+			let bs_K3 = document.getElementById('bs_K3');
+			let bs_T = document.getElementById('bs_T');
+			let bs_r = document.getElementById('bs_r');
+			let bs_sigma = document.getElementById('bs_sigma');
+			let bs_S_hedge = document.getElementById('bs_S_hedge');
+			let bs_v_off = document.getElementById('bs_v_off');
+
+			let bs_S_hedge_label = document.getElementById('bs_S_hedge_label');
+			let bs_K_label = document.getElementById('bs_K_label');
+			let bs_K2_label = document.getElementById('bs_K2_label');
+			let bs_K3_label = document.getElementById('bs_K3_label');
+			let bs_T_label = document.getElementById('bs_T_label');
+			let bs_r_label = document.getElementById('bs_r_label');
+			let bs_sigma_label = document.getElementById('bs_sigma_label');
+			let bs_v_off_label = document.getElementById('bs_v_off_label');
+
+			let graph_bs1_contents = document.getElementById('graph_bs1_contents');
+			let graph_bs2_contents = document.getElementById('graph_bs2_contents');
+			let graph_bs3_contents = document.getElementById('graph_bs3_contents');
+			let graph_bs4_contents = document.getElementById('graph_bs4_contents');
+			let graph_bs5_contents = document.getElementById('graph_bs5_contents');
+			let graph_bs6_contents = document.getElementById('graph_bs6_contents');
+
+			let strike_line0_1 = document.getElementById('strike_line0_1');
+			let strike_line0_2 = document.getElementById('strike_line0_2');
+			let strike_line0_3 = document.getElementById('strike_line0_3');
+
+			let strike_ptr0 = document.getElementById('strike_ptr0');
+			let strike_ptr1 = document.getElementById('strike_ptr1');
+			let strike_ptr2 = document.getElementById('strike_ptr2');
+
+			let strike_line1_1 = document.getElementById('strike_line1_1');
+			let strike_line1_2 = document.getElementById('strike_line1_2');
+			let strike_line1_3 = document.getElementById('strike_line1_3');
+
+			let strike_line2_1 = document.getElementById('strike_line2_1');
+			let strike_line2_2 = document.getElementById('strike_line2_2');
+			let strike_line2_3 = document.getElementById('strike_line2_3');
+
+			let strike_line3_1 = document.getElementById('strike_line3_1');
+			let strike_line3_2 = document.getElementById('strike_line3_2');
+			let strike_line3_3 = document.getElementById('strike_line3_3');
+
+			let strike_line4_1 = document.getElementById('strike_line4_1');
+			let strike_line4_2 = document.getElementById('strike_line4_2');
+			let strike_line4_3 = document.getElementById('strike_line4_3');
+
+			let strike_line5_1 = document.getElementById('strike_line5_1');
+			let strike_line5_2 = document.getElementById('strike_line5_2');
+			let strike_line5_3 = document.getElementById('strike_line5_3');
+
+			let strike_line6_1 = document.getElementById('strike_line6_1');
+			let strike_line6_2 = document.getElementById('strike_line6_2');
+			let strike_line6_3 = document.getElementById('strike_line6_3');
+
+			let details_blurb = document.getElementById('details_blurb');
+
+			let big_numbers = document.getElementById('big_numbers');
+			let default_label = document.getElementById('default_label');
+
+			let bs_St0 = document.getElementById('bs_St0');
+
+			let tick_s_0 = document.getElementsByClassName('tick_s_0');
+			let tick_s_2 = document.getElementsByClassName('tick_s_2');
+			let tick_s_4 = document.getElementsByClassName('tick_s_4');
+			let tick_s_6 = document.getElementsByClassName('tick_s_6');
+			let tick_s_7 = document.getElementsByClassName('tick_s_7');
+			let tick_s_1 = document.getElementsByClassName('tick_s_1');
+
+			function Vcall(S, K, T, r, sigma) {
+				let d1 = (Math.log(S / K) + (r + sigma * sigma * 0.5) * T) / (sigma * Math.sqrt(T));
+				let d2 = d1 - sigma * Math.sqrt(T);
+
+				let pv = S * approx_cdf(d1) - Math.exp(-r * T) * K * approx_cdf(d2);
+				let delta = approx_cdf(d1);
+				let gamma = approx_d_cdf(d1) / (S * sigma * Math.sqrt(T));
+				let theta = -S * approx_d_cdf(d1) * sigma / (2.0 * Math.sqrt(T)) - r * K * Math.exp(-r * T) * approx_cdf(d2);
+				let vega = S * Math.sqrt(T) * approx_d_cdf(d1);
+				let rho = K * T * Math.exp(-r * T) * approx_cdf(d2);
+				return { pv, delta, gamma, theta, vega, rho };
+			}
+
+			function Vput(S, K, T, r, sigma) {
+				let d1 = (Math.log(S / K) + (r + sigma * sigma * 0.5) * T) / (sigma * Math.sqrt(T));
+				let d2 = d1 - sigma * Math.sqrt(T);
+
+				let pv = -S * approx_cdf(-d1) + Math.exp(-r * T) * K * approx_cdf(-d2);
+				let delta = approx_cdf(d1) - 1.0;
+				let gamma = approx_d_cdf(d1) / (S * sigma * Math.sqrt(T));
+				let theta = -S * approx_d_cdf(d1) * sigma / (2.0 * Math.sqrt(T)) + r * K * Math.exp(-r * T) * approx_cdf(-d2);
+				let vega = S * Math.sqrt(T) * approx_d_cdf(d1);
+				let rho = -K * T * Math.exp(-r * T) * approx_cdf(-d2);
+				return { pv, delta, gamma, theta, vega, rho };
+			}
+
+			function value(strategy, buy_or_sell, v_off, S_hedge, S, K, T, r, sigma, K2, K3) {
+				let pv, delta, gamma, theta, vega, rho;
+
+				if (strategy == 'Call') {
+					let strategy = Vcall(S, K, T, r, sigma);
+					pv = buy_or_sell * strategy.pv + v_off + S_hedge * S;
+					delta = buy_or_sell * strategy.delta + S_hedge;
+					gamma = buy_or_sell * strategy.gamma;
+					theta = buy_or_sell * strategy.theta;
+					vega = buy_or_sell * strategy.vega;
+					rho = buy_or_sell * strategy.rho;
+				} else if (strategy == 'Put') {
+					let strategy = Vput(S, K, T, r, sigma);
+					pv = buy_or_sell * strategy.pv + v_off + S_hedge * S;
+					delta = buy_or_sell * strategy.delta + S_hedge;
+					gamma = buy_or_sell * strategy.gamma;
+					theta = buy_or_sell * strategy.theta;
+					vega = buy_or_sell * strategy.vega;
+					rho = buy_or_sell * strategy.rho;
+				} else if (strategy == 'Butterfly spread') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let call2 = Vcall(S, K2, T, r, sigma);
+					let call3 = Vcall(S, K3, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv - 2.0 * call2.pv + call3.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta - 2.0 * call2.delta + call3.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma - 2.0 * call2.gamma + call3.gamma);
+					theta = buy_or_sell * (call1.theta - 2.0 * call2.theta + call3.theta);
+					vega = buy_or_sell * (call1.vega - 2.0 * call2.vega + call3.vega);
+					rho = buy_or_sell * (call1.rho - 2.0 * call2.rho + call3.rho);
+				} else if (strategy == 'Risk reversal') {
+					let call1 = Vcall(S, K2, T, r, sigma);
+					let put1 = Vput(S, K, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv - put1.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta - put1.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma - put1.gamma);
+					theta = buy_or_sell * (call1.theta - put1.theta);
+					vega = buy_or_sell * (call1.vega - put1.vega);
+					rho = buy_or_sell * (call1.rho - put1.rho);
+				} else if (strategy == 'Bull spread') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let call2 = Vcall(S, K2, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv - call2.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta - call2.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma - call2.gamma);
+					theta = buy_or_sell * (call1.theta - call2.theta);
+					vega = buy_or_sell * (call1.vega - call2.vega);
+					rho = buy_or_sell * (call1.rho - call2.rho);
+				} else if (strategy == 'Bear spread') {
+					let put1 = Vput(S, K2, T, r, sigma);
+					let put2 = Vput(S, K, T, r, sigma);
+
+					pv = buy_or_sell * (put1.pv - put2.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (put1.delta - put2.delta) + S_hedge;
+					gamma = buy_or_sell * (put1.gamma - put2.gamma);
+					theta = buy_or_sell * (put1.theta - put2.theta);
+					vega = buy_or_sell * (put1.vega - put2.vega);
+					rho = buy_or_sell * (put1.rho - put2.rho);
+				} else if (strategy == 'Strip') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let put1 = Vput(S, K, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv + 2.0*put1.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta + 2.0*put1.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma + 2.0*put1.gamma);
+					theta = buy_or_sell * (call1.theta + 2.0*put1.theta);
+					vega = buy_or_sell * (call1.vega + 2.0*put1.vega);
+					rho = buy_or_sell * (call1.rho + 2.0*put1.rho);
+				} else if (strategy == 'Strap') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let put1 = Vput(S, K, T, r, sigma);
+
+					pv = buy_or_sell * (2.0*call1.pv + put1.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (2.0*call1.delta + put1.delta) + S_hedge;
+					gamma = buy_or_sell * (2.0*call1.gamma + put1.gamma);
+					theta = buy_or_sell * (2.0*call1.theta + put1.theta);
+					vega = buy_or_sell * (2.0*call1.vega + put1.vega);
+					rho = buy_or_sell * (2.0*call1.rho + put1.rho);
+				} else if (strategy == 'Straddle') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let put1 = Vput(S, K, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv + put1.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta + put1.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma + put1.gamma);
+					theta = buy_or_sell * (call1.theta + put1.theta);
+					vega = buy_or_sell * (call1.vega + put1.vega);
+					rho = buy_or_sell * (call1.rho + put1.rho);
+				} else if (strategy == 'Strangle') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let put1 = Vput(S, K2, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv + put1.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta + put1.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma + put1.gamma);
+					theta = buy_or_sell * (call1.theta + put1.theta);
+					vega = buy_or_sell * (call1.vega + put1.vega);
+					rho = buy_or_sell * (call1.rho + put1.rho);
+				} else if (strategy == 'Christmas Tree') {
+					let call1 = Vcall(S, K, T, r, sigma);
+					let call2 = Vcall(S, K2, T, r, sigma);
+					let call3 = Vcall(S, K3, T, r, sigma);
+
+					pv = buy_or_sell * (call1.pv - 3.0 * call2.pv + 2.0 * call3.pv) + v_off + S_hedge * S;
+					delta = buy_or_sell * (call1.delta - 3.0 * call2.delta + 2.0 * call3.delta) + S_hedge;
+					gamma = buy_or_sell * (call1.gamma - 3.0 * call2.gamma + 2.0 * call3.gamma);
+					theta = buy_or_sell * (call1.theta - 3.0 * call2.theta + 2.0 * call3.theta);
+					vega = buy_or_sell * (call1.vega - 3.0 * call2.vega + 2.0 * call3.vega);
+					rho = buy_or_sell * (call1.rho - 3.0 * call2.rho + 2.0 * call3.rho);
+				}
+
+				return { pv, delta, gamma, theta, vega, rho };
+			}
+
+			function bs_calc_update() {
+				let Smin = 0.001;
+				let Smax = 0;
+
+				let buy_or_sell = bs_position_buy.checked ? +1 : -1;
+
+				if (big_numbers.checked) {
+					bs_K.setAttribute('max', '300');
+					bs_v_off.setAttribute('min', '-300');
+					bs_v_off.setAttribute('max', '300');
+					Smax = 100.0;
+
+					for (const elm of tick_s_2) {
+						elm.innerHTML = '20';
+					}
+					for (const elm of tick_s_4) {
+						elm.innerHTML = '40';
+					}
+					for (const elm of tick_s_6) {
+						elm.innerHTML = '60';
+					}
+					for (const elm of tick_s_7) {
+						elm.innerHTML = '80';
+					}
+					for (const elm of tick_s_1) {
+						elm.setAttribute('x', 0.9);
+						elm.innerHTML = '100';
+					}
+				} else {
+					bs_K.setAttribute('max', '3');
+					bs_v_off.setAttribute('min', '-3');
+					bs_v_off.setAttribute('max', '3');
+					Smax = 1.0;
+
+					for (const elm of tick_s_2) {
+						elm.innerHTML = '0.2';
+					}
+					for (const elm of tick_s_7) {
+						elm.innerHTML = '0.8';
+					}
+					for (const elm of tick_s_4) {
+						elm.innerHTML = '0.4';
+					}
+					for (const elm of tick_s_6) {
+						elm.innerHTML = '0.6';
+					}
+					for (const elm of tick_s_1) {
+						elm.setAttribute('x', 0.97);
+						elm.innerHTML = '1';
+					}
+				}
+
+				const Srange = Smax - Smin;
+
+				let K = Number(bs_K.value);
+				bs_K_label.innerHTML = K;
+				let T = Number(bs_T.value);
+				bs_T_label.innerHTML = `${T} yrs`;
+				let r = Number(bs_r.value);
+				bs_r_label.innerHTML = `${Number(100 * r).toFixed(2)}%`;
+				let sigma = Number(bs_sigma.value);
+				bs_sigma_label.innerHTML = `${Number(100 * sigma).toFixed(0)}%`;
+
+				bs_St0.value = marker_post * dx;
+
+				let K2 = 0;
+				let K3 = 0;
+
+				let S_hedge = Number(bs_S_hedge.value);
+				bs_S_hedge_label.innerHTML = S_hedge;
+				let v_off = Number(bs_v_off.value);
+				bs_v_off_label.innerHTML = v_off;
+
+				graph_pointer_all.setAttribute('cx', marker_post * dx);
+				graph1_pointer.setAttribute('cx', marker_post * dx);
+				graph2_pointer.setAttribute('cx', marker_post * dx);
+				graph3_pointer.setAttribute('cx', marker_post * dx);
+				graph4_pointer.setAttribute('cx', marker_post * dx);
+				graph5_pointer.setAttribute('cx', marker_post * dx);
+				graph6_pointer.setAttribute('cx', marker_post * dx);
+
+				strike_ptr0.setAttribute('cx', `${(K - Smin) / Srange}`);
+				strike_line0_1.setAttribute('d', `M -1 0 L -1 1`);
+
+				pointer_line0.setAttribute('d', `M ${marker_post * dx} 0 L ${marker_post * dx} 1`);
+
+				//strike_line0_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line1_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line2_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line3_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line4_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line5_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+				strike_line6_1.setAttribute('d', `M ${(K - Smin) / Srange} 0 L ${(K - Smin) / Srange} 1`);
+
+				let requires_K2 = false;
+				let requires_K3 = false;
+
+				const opts = bs_strategy.children;
+				for (opt of opts) {
+					if (opt.value == bs_strategy.value) {
+						if (opt.classList.contains('requires_K2')) {
+							requires_K2 = true;
+						}
+						if (opt.classList.contains('requires_K3')) {
+							requires_K3 = true;
+						}
+						let blurb_info = opt.getAttribute('blurb');
+						if (blurb_info) {
+							details_blurb.innerHTML = blurb_info;
+						}
+						break;
+					}
+				}
+
+				if (requires_K2) {
+					const elms = document.getElementsByClassName('strike2');
+					for (const elm of elms) {
+						elm.style.visibility = 'visible';
+						elm.style.display = 'block';
+					}
+
+					if (big_numbers.checked) {
+						bs_K2.setAttribute('max', '300');
+					} else {
+						bs_K2.setAttribute('max', '3');
+					}
+
+					K2 = Number(bs_K2.value);
+
+					if (bs_strategy.value == 'Bull spread'
+					|| bs_strategy.value == 'Butterfly spread'
+					 || bs_strategy.value == 'Risk reversal'
+					  || bs_strategy.value == 'Bear spread'
+					  || bs_strategy.value == 'Strangle' 
+					  || bs_strategy.value == 'Christmas Tree') {
+						if (K2 < K) {
+							K2 = K;
+							bs_K2.value = K2;
+						}
+					}
+					bs_K2_label.innerHTML = K2;
+
+					//strike_line0_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_ptr1.setAttribute('cx', `${(K2 - Smin) / Srange}`);
+					strike_line0_2.setAttribute('d', `M -1 0 L -1 1`);
+
+					strike_line1_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_line2_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_line3_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_line4_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_line5_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+					strike_line6_2.setAttribute('d', `M ${(K2 - Smin) / Srange} 0 L ${(K2 - Smin) / Srange} 1`);
+
+
+				} else {
+					const elms2 = document.getElementsByClassName('strike2');
+					for (const elm of elms2) {
+						elm.style.visibility = 'hidden';
+						elm.style.display = 'none';
+					}
+
+					strike_ptr1.setAttribute('cx', `-1`);
+
+					strike_line0_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line1_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line2_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line3_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line4_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line5_2.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line6_2.setAttribute('d', `M -1 0 L -1 1`);
+				}
+
+				if (requires_K3) {
+					const elms2 = document.getElementsByClassName('strike3');
+					for (const elm of elms2) {
+						elm.style.visibility = 'visible';
+						elm.style.display = 'block';
+					}
+
+					if (big_numbers.checked) {
+						bs_K3.setAttribute('max', '300');
+					} else {
+						bs_K3.setAttribute('max', '3');
+					}
+
+					K3 = Number(bs_K3.value);
+					if (bs_strategy.value == 'Butterfly spread'
+					  || bs_strategy.value == 'Christmas Tree') {
+						if (K3 < K2) {
+							K3 = K2;
+							bs_K3.value = K2;
+						}
+					}
+					bs_K3_label.innerHTML = K3;
+
+					strike_ptr2.setAttribute('cx', `${(K3 - Smin) / Srange}`);
+					strike_line0_3.setAttribute('d', `M -1 0 L -1 1`);
+
+					//strike_line0_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line1_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line2_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line3_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line4_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line5_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+					strike_line6_3.setAttribute('d', `M ${(K3 - Smin) / Srange} 0 L ${(K3 - Smin) / Srange} 1`);
+
+				} else {
+					const elms2 = document.getElementsByClassName('strike3');
+					for (const elm of elms2) {
+						elm.style.visibility = 'hidden';
+						elm.style.display = 'none';
+					}
+
+					strike_ptr2.setAttribute('cx', `-1`);
+					strike_line0_3.setAttribute('d', `M -1 0 L -1 1`);
+
+					//strike_line0_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line1_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line2_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line3_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line4_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line5_3.setAttribute('d', `M -1 0 L -1 1`);
+					strike_line6_3.setAttribute('d', `M -1 0 L -1 1`);
+				}
+
+				document.getElementById('pv_legend').setAttribute('fill', pv_visible?'var(--pv_plt)':'#ccc');
+				document.getElementById('delta_legend').setAttribute('fill', delta_visible?'var(--delta_plt)':'#ccc');
+				document.getElementById('gamma_legend').setAttribute('fill', gamma_visible?'var(--gamma_plt)':'#ccc');
+				document.getElementById('theta_legend').setAttribute('fill', theta_visible?'var(--theta_plt)':'#ccc');
+				document.getElementById('rho_legend').setAttribute('fill', rho_visible?'var(--rho_plt)':'#ccc');
+				document.getElementById('vega_legend').setAttribute('fill', vega_visible?'var(--vega_plt)':'#ccc');
+
+				let pv_min = big_numbers.checked ? -100 : -1, pv_max = big_numbers.checked ? 100 : 1;
+				let delta_min = big_numbers.checked ? -3 : -3, delta_max = big_numbers.checked ? 3 : 3;
+				let gamma_min = big_numbers.checked ? -3 : -3, gamma_max = big_numbers.checked ? 3 : 3;
+				let theta_min = big_numbers.checked ? -40 : -1, theta_max = big_numbers.checked ? 40 : 1;
+				let vega_min = big_numbers.checked ? -40 : -1, vega_max = big_numbers.checked ? 40 : 1;
+				let rho_min = big_numbers.checked ? -40 : -1, rho_max = big_numbers.checked ? 40 : 1;
+
+				let rescale_axis = bs_scale_axis.checked;
+
+				if (rescale_axis) {
+					pv_min ^= pv_max; pv_max ^= pv_min; pv_min ^= pv_max;
+					delta_min ^= delta_max; delta_max ^= delta_min; delta_min ^= delta_max;
+					gamma_min ^= gamma_max; gamma_max ^= gamma_min; gamma_min ^= gamma_max;
+					theta_min ^= theta_max; theta_max ^= theta_min; theta_min ^= theta_max;
+					vega_min ^= vega_max; vega_max ^= vega_min; vega_min ^= vega_max;
+					rho_min ^= rho_max; rho_max ^= rho_min; rho_min ^= rho_max;
+				}
+
+				shopping_basket.innerHTML = ``;
+				if (bs_strategy.value == 'Call') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Put') {
+					shopping_basket.innerHTML = `Buy 1 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Butterfly spread') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Sell 2 call options (strike=${K2}, expiry=${T})<br/>Buy 1 call option (strike=${K3}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Risk reversal') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K2}, expiry=${T})<br/>Sell 1 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Bull spread') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Sell 1 call option (strike=${K2}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Bear spread') {
+					shopping_basket.innerHTML = `Buy 1 put option (strike=${K2}, expiry=${T})<br/>Sell 1 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Strip') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Buy 2 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Strap') {
+					shopping_basket.innerHTML = `Buy 2 call options (strike=${K}, expiry=${T})<br/>Buy 1 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Straddle') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Buy 1 put option (strike=${K}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Strangle') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Buy 1 put option (strike=${K2}, expiry=${T})`;
+				} else if (bs_strategy.value == 'Christmas Tree') {
+					shopping_basket.innerHTML = `Buy 1 call option (strike=${K}, expiry=${T})<br/>Sell 3 call options (strike=${K2}, expiry=${T})<br/>Buy 2 call options (strike=${K3}, expiry=${T})`;
+				}
+				if (S_hedge != 0) {
+					if (S_hedge > 0) {
+						shopping_basket.innerHTML += `<br/>Buy ${S_hedge} x underlying asset`;
+					} else {
+						shopping_basket.innerHTML += `<br/>Short ${-S_hedge} of underlying asset`;
+					}
+				}
+				shopping_basket.innerHTML += `<br/><br/><span style="font-size:0.5em;">Note - in many assets the contract size will be 100x of the asset, you may have to adjust your calculations accordingly. A single call or put option here assumed to be for 1 quantity of the underlying asset.</span>`;
+
+				for (rescale_itr = 0; rescale_itr < 2; rescale_itr++) { // do a dry-run for axis scaling
+					let S = Smin;
+					let d1 = (Math.log(S / K) + (r + sigma * sigma * 0.5) * T) / (sigma * Math.sqrt(T));
+					let d2 = d1 - sigma * Math.sqrt(T);
+
+					let { pv, delta, gamma, theta, vega, rho } = value(bs_strategy.value, buy_or_sell, v_off, S_hedge, S, K, T, r, sigma, K2, K3);
+
+					let x = 0.0;
+					const low = 0.92;
+					const high = 0.8;
+					let y = low - high * (pv - pv_min) / (pv_max - pv_min + 1e-10);
+					if (marker_post == 0) {
+						graph_pointer_all.setAttribute('cy', y);
+						graph1_pointer.setAttribute('cy', y);
+						result_s.innerHTML = Number(Smin).toFixed(6).slice(0, 6);
+						result_pv.innerHTML = Number(pv).toFixed(6).slice(0, 6);
+					}
+					let str_pv = `M ${x} ${y}`;
+					y = low - high * (delta - delta_min) / (delta_max - delta_min + 1e-10);
+					if (marker_post == 0) {
+						graph2_pointer.setAttribute('cy', y);
+						result_delta.innerHTML = Number(delta).toFixed(6).slice(0, 6);
+					}
+					let str_delta = `M ${x} ${y}`;
+					y = low - high * (gamma - gamma_min) / (gamma_max - gamma_min + 1e-10);
+					if (marker_post == 0) {
+						graph3_pointer.setAttribute('cy', y);
+						result_gamma.innerHTML = Number(gamma).toFixed(6).slice(0, 6);
+					}
+					let str_gamma = `M ${x} ${y}`;
+					y = low - high * (vega - vega_min) / (vega_max - vega_min + 1e-10);
+					if (marker_post == 0) {
+						graph4_pointer.setAttribute('cy', y);
+						result_vega.innerHTML = Number(vega).toFixed(6).slice(0, 6);
+					}
+					let str_vega = `M ${x} ${y}`;
+					y = low - high * (rho - rho_min) / (rho_max - rho_min + 1e-10);
+					if (marker_post == 0) {
+						graph5_pointer.setAttribute('cy', y);
+						result_rho.innerHTML = Number(rho).toFixed(6).slice(0, 6);
+					}
+					let str_rho = `M ${x} ${y}`;
+					y = low - high * (theta - theta_min) / (theta_max - theta_min + 1e-10);
+					if (marker_post == 0) {
+						graph6_pointer.setAttribute('cy', y);
+						result_theta.innerHTML = Number(theta).toFixed(6).slice(0, 6);
+					}
+					let str_theta = `M ${x} ${y}`;
+
+					if (rescale_axis && rescale_itr == 0) {
+						pv_min = Math.min(pv_min, pv);
+						pv_max = Math.max(pv_max, pv);
+
+						delta_min = Math.min(delta_min, delta);
+						delta_max = Math.max(delta_max, delta);
+
+						gamma_min = Math.min(gamma_min, gamma);
+						gamma_max = Math.max(gamma_max, gamma);
+
+						vega_min = Math.min(vega_min, vega);
+						vega_max = Math.max(vega_max, vega);
+
+						rho_min = Math.min(rho_min, rho);
+						rho_max = Math.max(rho_max, rho);
+
+						theta_min = Math.min(theta_min, theta);
+						theta_max = Math.max(theta_max, theta);
+					}
+
+					for (j = 1; j < NX; ++j) {
+						x += dx;
+
+						S = Smin + (j / (NX - 1)) * Srange;
+						let { pv, delta, gamma, theta, vega, rho } = value(bs_strategy.value, buy_or_sell, v_off, S_hedge, S, K, T, r, sigma, K2, K3);
+
+						y = low - high * (pv - pv_min) / (pv_max - pv_min + 1e-10);
+						if (marker_post == j) {
+							graph_pointer_all.setAttribute('cy', y);
+							graph1_pointer.setAttribute('cy', y);
+							result_s.innerHTML = Number(S).toFixed(6).slice(0, 6);
+							result_pv.innerHTML = Number(pv).toFixed(6).slice(0, 6);
+						}
+						str_pv += `L ${x}, ${y}\n`;
+						y = low - high * (delta - delta_min) / (delta_max - delta_min + 1e-10);
+						if (marker_post == j) {
+							graph2_pointer.setAttribute('cy', y);
+							result_delta.innerHTML = Number(delta).toFixed(6).slice(0, 6);
+						}
+						str_delta += `L ${x}, ${y}\n`;
+						y = low - high * (gamma - gamma_min) / (gamma_max - gamma_min + 1e-10);
+						if (marker_post == j) {
+							graph3_pointer.setAttribute('cy', y);
+							result_gamma.innerHTML = Number(gamma).toFixed(6).slice(0, 6);
+						}
+						str_gamma += `L ${x}, ${y}\n`;
+						y = low - high * (vega - vega_min) / (vega_max - vega_min + 1e-10);
+						if (marker_post == j) {
+							graph4_pointer.setAttribute('cy', y);
+							result_vega.innerHTML = Number(vega).toFixed(6).slice(0, 6);
+						}
+						str_vega += `L ${x}, ${y}\n`;
+						y = low - high * (rho - rho_min) / (rho_max - rho_min + 1e-10);
+						if (marker_post == j) {
+							graph5_pointer.setAttribute('cy', y);
+							result_rho.innerHTML = Number(rho).toFixed(6).slice(0, 6);
+						}
+						str_rho += `L ${x}, ${y}\n`;
+						y = low - high * (theta - theta_min) / (theta_max - theta_min + 1e-10);
+						if (marker_post == j) {
+							graph6_pointer.setAttribute('cy', y);
+							result_theta.innerHTML = Number(theta).toFixed(6).slice(0, 6);
+						}
+						str_theta += `L ${x}, ${y}\n`;
+
+						if (rescale_axis && rescale_itr == 0) {
+							pv_min = Math.min(pv_min, pv);
+							pv_max = Math.max(pv_max, pv);
+
+							delta_min = Math.min(delta_min, delta);
+							delta_max = Math.max(delta_max, delta);
+
+							gamma_min = Math.min(gamma_min, gamma);
+							gamma_max = Math.max(gamma_max, gamma);
+
+							vega_min = Math.min(vega_min, vega);
+							vega_max = Math.max(vega_max, vega);
+
+							rho_min = Math.min(rho_min, rho);
+							rho_max = Math.max(rho_max, rho);
+
+							theta_min = Math.min(theta_min, theta);
+							theta_max = Math.max(theta_max, theta);
+						}
+					}
+
+					if (pv_max - pv_min < 1e-3) { pv_min = pv_max - 1e-3; }
+					if (delta_max - delta_min < 1e-3) { delta_min = delta_max - 1e-3; }
+					if (gamma_max - gamma_min < 1e-3) { gamma_min = gamma_max - 1e-3; }
+					if (theta_max - theta_min < 1e-3) { theta_min = theta_max - 1e-3; }
+					if (vega_max - vega_min < 1e-3) { vega_min = vega_max - 1e-3; }
+					if (rho_max - rho_min < 1e-3) { rho_min = rho_max - 1e-3; }
+
+					if (rescale_itr == 1 || rescale_axis == false) {
+
+						let y_zero_level = low - high * (0 - pv_min) / (pv_max - pv_min);
+						graph_bs1_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						y_zero_level = low - high * (0 - delta_min) / (delta_max - delta_min);
+						graph_bs2_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						y_zero_level = low - high * (0 - gamma_min) / (gamma_max - gamma_min);
+						graph_bs3_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						y_zero_level = low - high * (0 - vega_min) / (vega_max - vega_min);
+						graph_bs4_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						y_zero_level = low - high * (0 - rho_min) / (rho_max - rho_min);
+						graph_bs5_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						y_zero_level = low - high * (0 - theta_min) / (theta_max - theta_min);
+						graph_bs6_contents.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.0035" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+
+						graph_bs1_contents.innerHTML += `<path fill="none" stroke="var(--pv_plt)" stroke-width="0.0035" d="${str_pv}" />\n`;
+						graph_bs2_contents.innerHTML += `<path fill="none" stroke="var(--delta_plt)" stroke-width="0.007" d="${str_delta}" />\n`;
+						graph_bs3_contents.innerHTML += `<path fill="none" stroke="var(--gamma_plt)" stroke-width="0.007" d="${str_gamma}" />\n`;
+						graph_bs4_contents.innerHTML += `<path fill="none" stroke="var(--vega_plt)" stroke-width="0.007" d="${str_vega}" />\n`;
+						graph_bs5_contents.innerHTML += `<path fill="none" stroke="var(--rho_plt)" stroke-width="0.007" d="${str_rho}" />\n`;
+						graph_bs6_contents.innerHTML += `<path fill="none" stroke="var(--theta_plt)" stroke-width="0.007" d="${str_theta}" />\n`;
+
+						y_zero_level = low - high * (0 - pv_min) / (pv_max - pv_min);
+						graph_bs_all.innerHTML = `<path fill="none" stroke="var(--pointer_plt)" stroke-width="0.00135" d="M 0 ${y_zero_level} L 1 ${y_zero_level}" />\n`;
+						strike_ptr0.setAttribute('cy', `${y_zero_level}`);
+						strike_ptr1.setAttribute('cy', `${y_zero_level}`);
+						strike_ptr2.setAttribute('cy', `${y_zero_level}`);
+						
+
+						graph_bs_all.innerHTML += (
+							(delta_visible ? `<path fill="none" stroke="var(--delta_plt)" stroke-width="0.0017" d="${str_delta}" />\n` : '')
+							+ (gamma_visible ? `<path fill="none" stroke="var(--gamma_plt)" stroke-width="0.0017" d="${str_gamma}" />\n` : '')
+							+ (vega_visible ? `<path fill="none" stroke="var(--vega_plt)" stroke-width="0.0017" d="${str_vega}" />\n` : '')
+							+ (rho_visible ? `<path fill="none" stroke="var(--rho_plt)" stroke-width="0.0017" d="${str_rho}" />\n` : '')
+							+ (theta_visible ? `<path fill="none" stroke="var(--theta_plt)" stroke-width="0.0017" d="${str_theta}" />\n` : '')
+							+ (pv_visible ? `<path fill="none" stroke="var(--pv_plt)" stroke-width="0.004" d="${str_pv}" />\n` : '')
+						);
+
+						break;
+					}
+				}
+
+				return false;
+			}
+
+			bs_calc_update();
+
+			let play_state = 'stop';
+			let bs_T_target = 0.0;
+			let tick_T = 0.0;
+			let zero_wait = 10;
+
+			function tick() {
+				if (play_state == 'stop') {
+					setTimeout(tick, 200);
+				} else {
+					if (tick_T > 1.0) {
+						tick_T -= 0.05;
+					} else if (tick_T > 0.5) {
+						tick_T -= 0.025;
+					} else if (tick_T > 0.25) {
+						tick_T -= 0.0125;
+					} else if (tick_T > 0.125) {
+						tick_T -= 0.00625;
+					} else if (tick_T > 0.05) {
+						tick_T -= 0.00225;
+					} else if (tick_T > 0.025) {
+						tick_T -= 0.001;
+					} else if (tick_T > 0.0) {
+						tick_T -= 0.0005;
+					}
+					if (tick_T < 0) {
+						zero_wait -= 1;
+					}
+					if (tick_T < 0 && zero_wait == 0) {
+						//tick_T = bs_T_target;
+						zero_wait = 10;
+					}
+					bs_T.value = tick_T;
+
+					bs_calc_update();
+					setTimeout(tick, 100);
+				}
+			}
+			setTimeout(tick, 100);
+		</script>
+
+		<div style="padding-left:30px;padding-right:10px;">
+
+			<br /><br />
+			<h3>Description
+			<button style="width:2em;" onclick="
+			let description_all=document.getElementById('description_all');
+			description_all.style.visibility='visible';
+			description_all.style.display='block';
+			event.target.style.visibility='hidden';
+			event.target.style.display='none';
+			">...</button>
+			</h3>
+
+			<!--div style="position: relative; margin: auto; width:100%;">
+				<div style="margin:auto; width:100%; cursor: pointer; ">
+					<div style="position: relative; left:50%; margin:auto; width:100%;"
+					onclick="
+			let description_all=document.getElementById('description_all');
+			description_all.style.visibility='visible';
+			description_all.style.display='block';
+			">
+				<img src="./dots.svg" width="40em"  />
+			</div>
+				</div>
+			</div-->
+			<br /><br />
+
+			<div id="description_all" style="display: none; visibility: hidden;">
+				<p>
+					Options are common financial instruments for conditionally buying or selling an asset
+					at a future date.
+					Suppose that you are running a bakery and you need to buy a certain amount of sugar at the start of
+					each
+					year
+					for your business.
+					The price of sugar is likely to flucuate between now and the new year, and by the time
+					you come to purchase your next supply, the price may be much higher than
+					today.
+					<br /><br />
+
+					One possible way to mitigate against a potentially higher price would be to
+					pay for the sugar today, but negotiate for the delivery to take place at the start of next year.
+					However, if sugar drops in price before then,
+					you will have done yourself out of the opportunity to buy it cheaper.
+					<br /><br />
+
+					Unsure whether or not today&apos;s price will be better than next year&apos;s price, you could take
+					out
+					an order for the sugar conditional on the price of sugar at the start of the new year being above a
+					certain threshold.
+					This type of financial contract is known as a <i>call</i> option, and the threshold value, the price
+					preagreed for sugar next year, is referred to as the
+					strike price.
+					The call option would grant you
+					the opportunity to buy the sugar at the strike price, but would allow you to walk away if the price
+					of
+					sugar were cheaper elsewhere.
+					<br /><br />
+
+					In order determine a fair price for this option today, we have to consider a number of
+					things. For the sake of this example, we assume that the option here is of European type and can
+					only
+					be exercised at one specific time point in the future referred to as the option&apos;s maturity or
+					expiry date.
+					Other styles of options have different
+					features, for instance, Bermudan style options can be exercised at multiple dates, not just at
+					expiry,
+					while American style
+					options can be exercised any time prior to expiry. Call options are not the only type of option
+					either.
+					If
+					a farmer seeks to sell their crop on the market in future, and wants to ensure that they are sold
+					at a price that
+					would at least cover their farming losses and leave them with a satisfactory profit for their
+					business,
+					then
+					they could take out what is known as a <i>put</i> option, ensuring that their crop could be sold for
+					at
+					least the preagreed strike price. However, the farmer would still be permitted to sell their crop on
+					the
+					open market
+					if that would be more profitable.
+					<br /><br />
+
+					To give some idea of how to come to a price for an option, we have to briefly discuss the idea of a
+					fair
+					trade.
+					A fair trade is one in which
+					both parties agree to exchange things which they believe to be worth the same value.
+					For example, the bakery will be
+					paying money to a financial institution in exchange for a reduction in risk to their business
+					operations.
+					The financial institution has to charge the bakery an
+					amount that they deem to be fair for the level of risk that they then assume.
+					Remember that should the price of sugar rise unexpectedly, the financial institution is still
+					obliged to provide the sugar to the bakery next year.
+					To get an idea of how
+					much the financial institution will be paying for sugar in future,
+					they look to the expected future value of sugar and apply a discount factor to account for the time
+					value of money.
+					<br /><br />
+
+					Accurate models of the expected price of the asset (sugar in this example) are highly debated,
+					but a simple model for the underlying asset, made famous in the options world by Black and Scholes,
+					
+					uses geometric
+					Brownian motion. Mathematically, the model takes the form
+					\[S_{t} = S_{0} \exp\left( (\mu - \frac{1}{2}\sigma^2) t + \sigma W_{t}^{P} \right), \tag{1}
+					\label{S1}
+					\]
+					where \(S_{t}\equiv S(t)\) denotes the value of sugar at time \(t\), \(\mu\) is the expected
+					rate of return of the asset (think of interest earned in a bank account, though worth noting is that
+					this particular bank may not have a deposit protection scheme), \(\sigma\) denotes the volatility of
+					the
+					asset (how wildly the price would vary) and \(W_{t}^{P}\)
+					is a standard Weiner process in the real-world measure denoted by \(P\). We use the subscript \(t\)
+					(e.g. \(S_{t}\))
+					to it make apparent that the process is varying in time.
+					<br /><br />
+
+					Suppose that we have a process \(X_{t}\) defined as
+					\[ X_{t} = (\mu - \frac{1}{2}\sigma^2) t + \sigma W_{t}^{P} \]
+					so that
+					\[ dX_{t} = (\mu - \frac{1}{2}\sigma^2) dt + \sigma dW_{t}^{P} \tag{2} \label{X1} \]
+					and therefore we can rewrite (\(\ref{S1}\)) as
+					\[ S_{t} = S_{0} \exp(X_{t} ). \tag{3} \label{S2} \]
+
+					Differentiating (\(\ref{S2}\)) and using Ito&apos;s lemma (noting that \(S_t \equiv S(t, \, X_{t} )
+					\) )
+					gives
+					\[
+					dS_{t} = \frac{\partial S_{t}}{dt} dt
+					+ \frac{\partial S_{t}}{\partial X_{t}} d X_{t}
+					+ \frac{1}{2} \frac{\partial^2 S_{t}}{\partial X_{t}^2} d X_{t}^2, \tag{4} \label{S3}
+					\]
+					where, substituting (\(\ref{X1}\)) into (\(\ref{S3}\)), we obtain
+					\[
+					\begin{align}
+					dS_{t} &= S_{t} \left( (\mu - \frac{1}{2}\sigma^2) dt + \sigma dW_{t}^{P} \right)
+					+ \frac{1}{2} S_{t} \left( (\mu - \frac{1}{2}\sigma^2) dt + \sigma dW_{t}^{P} \right)^2 ,
+					\end{align} \tag{5} \label{S5}
+					\]
+					since \(\partial S_{t} / \partial t = 0\) and \(\partial^{2} S_{t} / \partial X_{t}^{2} = \partial
+					S_{t}
+					/ \partial X_{t} = S_{t} \).
+					Finally, using Ito&apos;s identities \( dW_{t}^2 \to dt \), \(dt^2 \to 0\) and \( dt \, dW_{t} \to 0
+					\),
+					in (\(\ref{S5}\))
+					gives
+					\[
+					dS_{t} = \mu S_{t} dt + \sigma S_{t} dW_{t}^{P} \tag{6} \label{S6}.
+					\]
+				<br />
+					Now that we have a rough model for the price of sugar, we return to the problem of finding the
+					option
+					price
+					which we denote
+					here by \(V \equiv V(t, S_{t})\). To get an idea of how \(V\) varies in time, we can
+					differentiate \(V\) with respect to \(t\) and use Ito&apos;s lemma to obtain
+					\[
+					dV = \frac{\partial V}{\partial t} dt + \frac{\partial V}{\partial S} dS +
+					\frac{1}{2}\frac{\partial^2
+					V}{\partial S^2} dS^2. \tag{7} \label{dV1}
+					\]
+					Substituting our expression for the change in asset price \(dS\) from (\(\ref{S6}\)) into
+					(\(\ref{dV1}\)) we have
+					\[
+					dV = \frac{\partial V}{\partial t} dt + \frac{\partial V}{\partial S} \left( \mu S_{t} dt + \sigma
+					S_{t}
+					dW^{P}_{t} \right)
+					+ \frac{1}{2}\frac{\partial^2 V}{\partial S^2} \left( \mu S_{t} dt + \sigma S_{t} dW^{P}_{t}
+					\right)^2,
+					\]
+					and, recalling Ito&apos;s identities, this simplifes to
+					\[
+					dV = \left( \frac{\partial V}{\partial t} + \mu S_{t} \frac{\partial V}{\partial S}
+					+ \frac{1}{2} \sigma^2 S_{t}^{2} \frac{\partial^2 V}{\partial S^2} \right) dt
+					+ \frac{\partial V}{\partial S} \sigma S_{t} dW^{P}_{t} . \tag{8} \label{dV2}
+					\]
+
+					Suppose that the option seller bears no risk. This could be because they have an infinite supply of
+					sugar, or they have the means to hedge their risk entirely.
+					The option price today would be expected to be the option price at expiry discounted at a rate \(r\)
+					that reflects
+					the time value of money, or the lack of any actual risk. Think of this as putting your money into a
+					bank
+					but,
+					unlike before, this bank actually operates
+					a protection scheme which means
+					that you will never lose your deposit. Mathematically, we have
+					\[
+					E_{Q}[dV] = r V dt,
+					\]
+					where \(E_{Q}[\,\cdot\,]\) denotes the expectation under the risk-free measure \(Q\). In order to be
+					consistent with (\(\ref{dV2}\)),
+					we must also have
+					\[
+					E_{Q}\left[\left( \frac{\partial V}{\partial t} + \mu S_{t} \frac{\partial V}{\partial S}
+					+ \frac{1}{2} \sigma^2 S_{t}^2 \frac{\partial^2 V}{\partial S^2} \right) dt
+					+ \frac{\partial V}{\partial S} \sigma S_{t} dW^{P}_{t} \right] = r V dt,
+					\]
+					or, taking the deterministic terms outside of the expectation,
+					\[
+					\left( \frac{\partial V}{\partial t} + \mu S_{t} \frac{\partial V}{\partial S}
+					+ \frac{1}{2} \sigma^2 S_{t}^2 \frac{\partial^2 V}{\partial S^2} \right) dt
+					+ \frac{\partial V}{\partial S} \sigma S_{t} E_{Q}\left[ dW^{P}_{t} \right] = r V dt.
+					\]
+					<br /><br />
+
+					Since the process \(d W^{P}_{t}\) is in the real-world measure \(P\), but our expectation
+					\(E_{Q}[\,\cdot\,]\) is in the
+					risk-free measure \(Q\), it is not immediately obvious how to proceed. Thankfully, Girsanov&apos;s
+					thereom shows that
+					a change in measure is tantamount to a particular change in drift. In this case, we have
+					\[
+					dW^{P}_{t} = dW^{Q}_{t} + \frac{r - \mu}{\sigma} dt,
+					\]
+					hence
+					\[
+					\left( \frac{\partial V}{\partial t} + (\mu - \mu + r) S_{t} \frac{\partial V}{\partial S}
+					+ \frac{1}{2} \sigma^2 S_{t}^2 \frac{\partial^2 V}{\partial S^2} \right) dt
+					+ \frac{\partial V}{\partial S} \sigma S_{t} E_{Q}\left[ dW^{Q}_{t} \right] = r V dt,
+					\]
+					and
+					\[
+					\left( \frac{\partial V}{\partial t} + r S_{t} \frac{\partial V}{\partial S}
+					+ \frac{1}{2} \sigma^2 S_{t}^2 \frac{\partial^2 V}{\partial S^2} \right) dt
+					= r V dt,
+					\]
+					since \( E_{Q}\left[ dW^{Q}_{t} \right] = 0 \) .
+					Finally, dividing through by \(dt \not = 0 \) and rearranging terms, we obtain the well-known Black
+					Scholes PDE
+					\[
+					\frac{\partial V}{\partial t}
+					+ \frac{1}{2} \sigma^2 S_{t}^2 \frac{\partial^2 V}{\partial S^2}
+					+ r S_{t} \frac{\partial V}{\partial S}
+					- r V = 0. \tag{9} \label{BS}
+					\]
+
+
+					<br /><br />
+
+					Different boundary conditions can be used in (\(\ref{BS}\)) to form specific types of
+					options.
+					For example, the
+					European style call option discussed above for sugar would use the boundary conditions
+					\[
+					V_{\text{call}}(t=T, S) = \max(S-K, \;\; 0), \qquad V_{\text{call}}(t, S=0) = 0, \qquad
+					V_{\text{call}}(t, S \to \infty) \to \infty. \tag{10} \label{bscall}
+					\]
+					The rationale is that the option will, at expiry, be worth \(S-K\) to the holder if the price of
+					sugar
+					\(S\) is above \(K\),
+					otherwise
+					it will be worthless.
+					If the price of sugar goes to 0, then the option will be worthless too, or extremely unlikely to
+					come
+					back into the money.
+					On the other hand, if the price of sugar increases substantially,
+					then the option is more likely to be exercised, and it will be worth \(S-K\) at expiry, therefore as
+					\(S\to \infty\), we take \(V_{\text{call}} \to \infty\).
+
+
+
+					The present day value of the option is found
+					by solving the PDE (backwards) in time.
+					<br /><br />
+
+					For the European style put option discussed above, the corresponding boundary
+					conditions are somewhat similar,
+					\[
+					V_{\text{put}}(t=T, S) = \max(K-S, \;\; 0), \qquad V_{\text{put}}(t, S=0) = K, \qquad
+					V_{\text{put}}(t,
+					S \to \infty) \to 0. \tag{11} \label{bsput}
+					\]
+					The rationale this time is that, at expiry, the farmer can sell their crop at the strike price \(K\)
+					even if their crop is only worth \(S
+					< K\) on the open market. If the price of their crop falls between now and then, they will have
+						secured a profit of \(K-S\). The best profit that they could hope to achieve would be a complete
+						collapse of the price, since then the seller of the put option is still obliged to pay \(K\) to
+						the farmer for the now worthless crop. On the flip side, if the crop price rises, then the
+						farmer will sell directly to the open market at the higher price and never exercise the put
+						option to sell at \(K\). <br /><br />
+
+					In the Black Scholes PDE (\(\ref{BS}\)), the coefficients \(\sigma\) and \(r\) are constants, and
+					a closed-form solution to the PDE is derivable for both call and put options.
+					The derivations
+					are omitted here, however, the interested reader may wish to apply Fourier transforms or
+					Green&apos;s
+					method to obtain the
+					analytical solutions. The solution of (\(\ref{BS}\)) with the call option boundary conditions
+					(\(\ref{bscall}\)) is
+					\[
+					V_{\text{call}}(t, S) = S \Phi\left( d_{1} \right)
+					- e^{-r T}K \Phi\left( d_{2} \right),
+					\]
+					where
+					\[
+					d_{1} = \frac{\log(S/K) + (r + \frac{1}{2}\sigma^2)T }{\sigma \sqrt{T}}, \qquad d_{2} = d_{1} -
+					\sigma
+					\sqrt{T},
+					\]
+					and \(\Phi(\,\cdot\,)\) denotes the cumulative density function for the standard <i>normal</i>
+					distribution \(\mathcal{N}(0,1)\),
+					\[
+					\Phi(x) = \int_{-\infty}^{x} e^{-\frac{1}{2}u^2} \, du.
+					\]
+					The put option is found similarily, by using boundary conditions (\(\ref{bsput}\)) in
+					(\(\ref{BS}\)),
+					\[
+					V_{\text{put}}(t, S) = -S \Phi\left( d_{1} \right) + e^{-r T}K \Phi\left(-d_{2} \right)
+					\]
+					with \(d_{1}\) and \(d_{2}\) as before.
+					<br /><br />
+
+
+
+					There are many other financial derivatives and strategies that can be constructed using combinations of these types of options.
+					An example of a common trading strategy is a <i>butterfly spread</i>,
+					which is made up of three distinct call options,
+					where two of these are long (meaning bought) and one of them is short (meaning sold) at twice the
+					quantity.
+					The price of this type of option is therefore given by
+					\[
+					V_{\text{fly}} = V_{\text{call}}(K=K1) + V_{\text{call}}(K=K2) - 2V_{\text{call}}(K=K3).
+					\]
+					It is common for the third strike to be positioned between the other two strikes, and then the
+					holder is
+					essentially betting that the underlying price will not move far from the middle strike.
+					Another example is a <i>risk reversal</i> strategy. Here a call option with one strike
+					is
+					bought and
+					a put option at another strike is sold
+					\[
+					V_{\text{rr}} = V_{\text{call}}(K=K1) - V_{\text{put}}(K=K2).
+					\]
+					It is common to see the strikes taken in such a way that the premium from the sale of the put will
+					pay
+					for
+					the purchase of the call, effectively costing the holder nothing to open the position. Of course,
+					they
+					will still
+					be obligated to fulfil their responsibilities to the holder of their put option, so
+					this strategy is not without risk.
+					<br /><br />
+
+					Since many market parameters change frequently, the holder of the risk, the option seller, will not
+					want
+					to allow this
+					risk to get unduly large. They look to the first order sensitivities (also known as <i>the
+						Greeks</i>)
+					to get a feel
+					for how risky a position is. The idea is that the change of a function can be expressed in terms of
+					its
+					underlying
+					changing parameters, similar to first-order Taylor series approximation,
+					\[
+					\Delta V(T, K, r, \sigma) = \frac{\partial V}{\partial T}\Delta T + \frac{\partial V}{\partial
+					K}\Delta
+					K + \frac{\partial V}{\partial r}\Delta r + \frac{\partial V}{\partial \sigma}\Delta \sigma +
+					O(\Delta^{2}).
+					\]
+					Note that here we use \(T\) to denote the time until expiry, or maturity, so for us this is always
+					relative to the present day.
+					In some textbooks, \(T\) is a fixed point, and an active parameter like \(\tau = T-t\) is used
+					instead.
+					We also note that \(\Delta K \equiv 0\) since the strike is
+					set at the beginning of the contract and does not change. The risk-free rate \(r\), and the
+					volatility
+					\(\sigma\), however, change
+					frequently.
+					<br /><br />
+
+					Each of these first-order sensitivities are commonly referenced in finance by their "Greek" names:
+					the
+					sensitivity of the option price to the asset price \(\partial V/\partial S\) is called <i>delta</i>
+					(&Delta;),
+					the sensitivity to the time until expiry \(\partial V/\partial T\) is called <i>theta</i> (&Theta;),
+					the
+					sensitivity to the risk-free rate \(\partial V/\partial r\) is called <i>rho</i> (&rho;),
+					and the sensitivity to the volatility \(\partial V/\partial \sigma\) is called <i>vega</i>
+					(\(\mathcal{V}\)) . The second-order sensitivity \(\partial^2 V/\partial S^2\)
+					known as <i>gamma</i> (&Gamma;) is also frequently used in risk management. Some of these risks can
+					be
+					mitigated, for instance, delta can be made arbitrarily large or small by buying or selling the
+					asset.
+					<br /><br />
+
+
+					During the life of the option, the option seller will seek to manage their risk in order to protect
+					themselves
+					against adverse market movements.
+					To do this, it is common to hold some, or all, of the asset that may have to be provided
+					at the option&apos;s maturity.
+
+					Consider again that you&apos;re running a bakery, and
+					you hold some cocoa as part of your day to day. You use up some of the cocoa to produce chocolate
+					cakes, but not all,
+					and you
+					wonder if the chocolatier next door would benefit from having the option to buy some of your
+					leftover cocoa. You estimate
+					that you usually have a surplus of 10KG each year leftover which, by today&apos;s value, is worth
+					about $100. The price
+					of cocoa has been fluctuating greatly recently, so you convince them to pay you a $5 premium today
+					for the right to buy
+					your 10KG of cocoa in 6 months time at $100. Over the next few months, the cocoa market goes into a
+					frenzy, and the
+					price of cocoa shoots up to $170. The chocolatier is lucky that they agreed to buy some of your
+					cocoa stock at the
+					now lower price.
+					<br /><br />
+
+					If you use up your full supply of cocoa in the next 6 months, you will have to go to the market
+					and buy the 10KG promised to the chocolatier at the now exorbitant price. Running out of the cocoa
+					would be an example
+					of a <i>naked</i> or <i>uncovered call</i>, where you are fully exposed to fluctuations in the market price of
+					cocoa.
+					On the other hand, if you do have 10KG of excess cocoa leftover in 6 months time, then you will not incur any additional costs, and this would be an example of a <i>covered call</i>.
+					<br /><br />
+
+					In order to maximise their profit, the seller of the option will not usually go and immediately
+					negate all of their
+					market risk, since that would likely cost them their entire premium.
+					Instead, they will manage their risk over time to try to retain as much of the
+					premium as possible.
+					<br /><br />
+
+					Note that the strategies in this app apply to European style options which
+					can be exercised only at expiry. American style options, on the other hand, are another popular
+					type of option often found on exchanges
+					that can be exercised at any point in the option&apos;s lifetime.
+					As a result of this additional flexibility, American options are
+					priced differently to European style options. The strategies in this app should not be blindly
+					applied
+					to options in the American style without due care. Finally, it is important to note that, in many
+					cases, there is also
+					an additional risk-free drift term to account for, for example, in the case of equities, this would
+					be expected
+					dividend payouts (omitted here).
+				</p>
+
+				<br />
+				<h3>Further reading</h3>
+				<br />
+
+				<p>
+					<span style="font-size:0.85em">Black Scholes original article</span>
+					<li style="margin-left:2em">
+						Black, F., Scholes, M. (1973)
+						<i>The pricing of options and corporate liabilities.</i>
+						Journal of Political Economy, 81(3):637-654.
+					</li>
+
+					<span style="font-size:0.85em">For details on financial derivatives, options and greeks</span>
+					<li style="margin-left:2em">
+						Hull, J. C. (2009)
+						<i>Options, Futures and Other Derivatives, 7th-ed.</i>
+						Pearson Education.
+					</li>
+
+					<li style="margin-left:2em">
+						Baxter, M., Rennie, A. (1996)
+						<i>Financial Calculus: An introduction to derivative pricing.</i>
+						Cambridge University Press.
+					</li>
+
+					<li style="margin-left:2em">
+						Wilmott, P. (2007)
+						<i>Paul Wilmott Introduces Quantitative Finance.</i>
+						John Wiley &amp; Sons.
+					</li>
+
+					<li style="margin-left:2em">
+						Chen, D. A., Sebastian, M. (2012)
+						<i>The Option Trader&apos;s Hedge Fund.</i>
+						Pearson Education.
+					</li>
+
+					<li style="margin-left:2em">
+						Cohen, G. (2016)
+						<i>The Bible of Options Strategies, 2nd-ed.</i>
+						Pearson Education.
+					</li>
+
+					<li style="margin-left:2em">
+						Overby, B. (2009)
+						<i>The Options Playbook, 2nd-ed.</i>
+						TradeKing.
+					</li>
+
+					<span style="font-size:0.85em">For an introduction to probability, measure theory and stochastic
+						calculus</span>
+					<li style="margin-left:2em">
+						Grimmett, G., Welsh, D. (2017)
+						<i>Probability: An Introduction, 2nd-ed.</i>
+						Oxford University Press.
+					</li>
+					<li style="margin-left:2em">
+						Williams, D. (1991)
+						<i>Probability with Martingales.</i>
+						Cambridge University Press.
+					</li>
+					<li style="margin-left:2em">
+						Axler, S. (2020)
+						<i>Measure, Integration and Real Analysis.</i>
+						Springer Open.
+					</li>
+					<li style="margin-left:2em">
+						Mikosch, T. (1998)
+						<i>Elementary Stochastic Calculus.</i>
+						World Scientific Publishing.
+					</li>
+					<li style="margin-left:2em">
+						Shreve, S. E. (2004)
+						<i>Stochastic Calculus for Finance II: Continuous-Time Models.</i>
+						Springer.
+					</li>
+					<li style="margin-left:2em">
+						Loffler, A., Kruschwitz L. (2019)
+						<i>The Brownian Motion.</i>
+						Springer.
+					</li>
+
+					<span style="font-size:0.85em">For numerical approximations of the cummulative density
+						function</span>
+					<li style="margin-left:2em">
+						Abramowitz, M., Stegun, I. (1972)
+						<i>Handbook of Mathematical Functions.</i>
+						National Bureau of Standards.
+					</li>
+				</p>
+			</div>
+
+			<br /><br />
+		</div>
+
+	</div>
+
+	<div id="div_tmp" style="position:absolute;top:0;height:100%;"></div>
+
+	<script type="text/javascript">
+		let snowflakes_opt = document.getElementsByClassName('snowflakes_opt');
+		const today = new Date();
+		function snow_tick() {
+			const snowable = bs_strategy.value == 'Christmas Tree' || today.getMonth()==11 || today.getMonth()==0;
+			if ( snowable ) {
+				for (let elm of snowflakes_opt) {
+					elm.style.display = 'block';
+					elm.style.visibility = 'visible';
+				}
+			} else {
+				for (let elm of snowflakes_opt) {
+					elm.style.display = 'none';
+					elm.style.visibility = 'invisible';
+				}
+			}
+			if (snowflakes_cb.checked && snowable) {
+				const xybod = document.body.getClientRects()[0];
+				for (let elm of snowflakes) {
+					const elmxy = elm.getClientRects()[0];
+					elm.style.top = `${elmxy.top -xybod.y + 10.1*(Math.random())}px`;
+					elm.style.left = `${elmxy.left + 10.1*(Math.random()-0.5)}px`;
+
+					if (elmxy.top -xybod.y > 1000) { 
+						elm.style.top = `${0}px`;
+					}
+				}
+				setTimeout(snow_tick, 120);
+			} else {
+				for (let elm of snowflakes) {
+					const elmxy = elm.getClientRects()[0];
+					elm.style.top = `${-30-Math.random()*1000}px`;
+					elm.style.left = `${elmxy.left + 10.1*(Math.random()-0.5)}px`;
+				}
+				setTimeout(snow_tick, 1000);
+			}
+		}
+
+		for (let idx = 0;idx<100; ++idx) {
+			let img = document.createElement('IMG');
+			img.classList.add('snowflake');
+			const flake = Math.random()<0.98;
+			img.src=flake?'./snowflake.svg':'./snowman.svg';
+			img.width=flake?"8":"24";
+			img.height=flake?"8":"24";
+			img.style.position='absolute';
+			img.style.top=`${-Math.random()*1000}px`;
+			img.style.left=`${Math.random()*1200}px`;
+
+			if (0 && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				//img.style.filter = '';
+			} else {
+				//img.style.filter = 'hue-rotate(1deg) brightness(2.5)';
+			}
+
+			document.body.appendChild(img);
+		}
+
+		if (0 && window.matchMedia) {
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event =>
+			{
+				if (event.matches) {
+					// dark
+					let elms = document.getElementsByClassName('snowflake');
+					for (let elm of elms) {
+						elm.style.filter = '';
+					}
+				} else {
+					// light
+					let elms = document.getElementsByClassName('snowflake');
+					for (let elm of elms) {
+						elm.style.filter = 'invert(1)';
+					}
+				}
+			}); 
+		}
+
+		let snowflakes = document.getElementsByClassName('snowflake');
+		let snowflakes_cb = document.getElementById('snowflakes_cb');
+
+		snow_tick();
+	</script>
+
+</body>
+
+</html>
