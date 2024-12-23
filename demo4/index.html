@@ -67,8 +67,10 @@
 						
 						<g id="graph_bs_all"></g>
 						<circle id="graph_pointer_all" cx="-10" cy="0" r="0.002" fill="red" stroke="none"></circle>
+						<!-- path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
+							d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" / -->
 						<path fill="none" stroke="var(--g6bb)" stroke-width="0.003"
-							d="M 0,.1 L 1,.1 L 1,.94 L 0,.94 z" />
+							d="M 0,.0 L 1,.0 L 1,.94 L 0,.94 z" />
 						<path id="pointer_line0" fill="none" stroke="#989898" stroke-width="0.0005"
 							d="M 0.5,0 L .5,1" />
 						<path id="strike_line0_1" fill="none" stroke="green" stroke-width="0.0015"
@@ -77,8 +79,8 @@
 							d="M 0.5,0 L .5,1" />
 						<path id="strike_line0_3" fill="none" stroke="green" stroke-width="0.0015"
 							d="M 0.5,0 L .5,1" />
-						<path fill="var(--gbbg)" stroke="none" stroke-width="0"
-							d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" />
+						<!-- path fill="var(--gbbg)" stroke="none" stroke-width="0"
+							d="M 0,.1 L 1,.1 L 1,0 L 0,0 z" / -->
 						<path fill="var(--gbbg)" stroke="none" stroke-width="0"
 							d="M 0,.94 L 0,1 L 1,1 L 1,.94 z" />
 
@@ -526,7 +528,6 @@
 
 					<label style="grid-column: 1; padding-right:.3em; color:var(--pointer_plt);">Asset price S</label>
 					<input style="grid-column: 2;" type="range" id="bs_St0" onchange="
-					console.log('onchange val=', event.target.value);
 							marker_post = Math.floor(Number(event.target.value) / dx);
 							bs_calc_update();" onmousemove="
 							marker_post = Math.floor(Number(event.target.value) / dx);
@@ -1959,6 +1960,7 @@
 			img.style.position='absolute';
 			img.style.top=`${-Math.random()*1000}px`;
 			img.style.left=`${Math.random()*1200}px`;
+
 
 			if (0 && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 				//img.style.filter = '';
