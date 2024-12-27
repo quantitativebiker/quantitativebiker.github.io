@@ -62,8 +62,8 @@ input {
 
     /* customizable */
     background: var(--bg1);
-    margin-top: -3em;
-    margin-left: 8em;
+    margin-top: -4em;
+    margin-left: 1em;
     z-index: 10;
 }
 

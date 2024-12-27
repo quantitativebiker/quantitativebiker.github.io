@@ -360,6 +360,11 @@
 						</div>
 					</div>
 				</div>
+
+				<br/><br/>
+				<div style="padding-left:0.5em;">
+					<span style="font-size:1.0em;">Note that \(V\) here refers to both the combination of the strategy selected and any additional underlying asset also held by adjusting the "Delta Hedge" setting \(V = V_{\text{strategy}} + \Delta S\).</span>
+				</div>
 			</div>
 
 			<div style="grid-column:2; ">
@@ -430,29 +435,31 @@
 
 					<label style="grid-column: 1;padding-right:.3em;">Position</label>
 					<div style="grid-column: 2/4;">
+						<label for="bs_position_buy" style="cursor: pointer;">Buy</label>
 						<input id="bs_position_buy" name="bs_position_group" type="radio" onchange="bs_calc_update();"
-							style="padding-left:0.1em;padding-right:0.5em;" checked>Buy</input>
+							style="padding-left:0.1em;padding-right:0.5em;" checked></input>
+						<label for="bs_position_sell" style="cursor: pointer;">Sell</label>
 						<input id="bs_position_sell" name="bs_position_group" type="radio" onchange="bs_calc_update();"
-							style="padding-left:0.1em;padding-right:0.5em;">Sell</input>
+							style="padding-left:0.1em;padding-right:0.5em;"></input>
 					</div>
 
 					<label class="snowflakes_opt" style="grid-column: 1;padding-right:.3em;">Snowflakes</label>
 					<label class="snowflakes_opt" style="grid-column: 2;">  </label>
 					<input class="snowflakes_opt" style="grid-column: 3;" type="checkbox" id="snowflakes_cb" onchange="bs_calc_update();" onmousemove="bs_calc_update();" checked />
 
-					<h3 style="grid-column: 1/4;">
+					<h5 style="grid-column: 1/4;">
 						<br />
 						Details
-					</h3>
+					</h5>
 
-					<div h3 style="grid-column: 1/4;" id="details_blurb">
+					<div style="grid-column: 1/4;" id="details_blurb">
 						...
 					</div>
 
-					<h3 style="grid-column: 1/4;">
+					<h5 style="grid-column: 1/4;">
 						<br />
 						Strategy Parameters
-					</h3>
+					</h5>
 
 					<label style="grid-column: 1; padding-right:.3em;">Expiry T</label>
 					<div style="grid-column: 2;">
@@ -487,6 +494,11 @@
 						onmousemove="bs_calc_update();" min="0.01" max="3" step="0.01" value="0.8" class="strike3" />
 					<label style="grid-column: 3;margin-left:0.5em;" id="bs_K3_label" class="strike3"> 10.0 </label>
 
+					<h5 style="grid-column: 1/4;">
+						<br />
+						Model Parameters
+					</h5>
+
 					<label style="grid-column: 1;padding-right:.3em;">Rate r</label>
 					<input style="grid-column: 2;" type="range" id="bs_r" onchange="bs_calc_update();"
 						onmousemove="bs_calc_update();" min="0" max="0.5" step="0.0001" value="0.05" />
@@ -498,10 +510,10 @@
 					<label style="grid-column: 3;margin-left:0.5em;" id="bs_sigma_label"> 10.0 </label>
 
 
-					<h3 style="grid-column: 1/4;">
+					<h5 style="grid-column: 1/4;">
 						<br />
 						Portfolio Parameters
-					</h3>
+					</h5>
 
 					<label style="grid-column: 1; padding-right:.3em;"> Premium offset</label>
 					<div style="grid-column: 2;">
@@ -521,10 +533,10 @@
 					</div>
 					<label style="grid-column: 3;margin-left:0.5em;" id="bs_S_hedge_label"> 10.0 </label>
 
-					<h3 style="grid-column: 1/4;">
+					<h5 style="grid-column: 1/4;">
 						<br />
 						Pointer
-					</h3>
+					</h5>
 
 					<label style="grid-column: 1; padding-right:.3em; color:var(--pointer_plt);">Asset price S</label>
 					<input style="grid-column: 2;" type="range" id="bs_St0" onchange="
@@ -552,10 +564,10 @@
 					<label style="grid-column: 1/3; padding-right:.3em; color:var(--theta_plt);">Theta</label>
 					<label style="grid-column: 3; padding-right:.3em; color:var(--theta_plt);" id="result_theta">theta</label>
 
-					<h3 style="grid-column: 1/4;">
+					<h5 style="grid-column: 1/4;">
 						<br />
 						Shopping basket
-					</h3>
+					</h5>
 					<p id="shopping_basket" style="grid-column: 1/4;">shopping_basket</p><br />
 
 				</div>
@@ -1677,12 +1689,12 @@
 					and \(\Phi(\,\cdot\,)\) denotes the cumulative density function for the standard <i>normal</i>
 					distribution \(\mathcal{N}(0,1)\),
 					\[
-					\Phi(x) = \int_{-\infty}^{x} e^{-\frac{1}{2}u^2} \, du.
+					\Phi(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{x} e^{-\frac{1}{2}u^2} \, du.
 					\]
 					The put option is found similarily, by using boundary conditions (\(\ref{bsput}\)) in
 					(\(\ref{BS}\)),
 					\[
-					V_{\text{put}}(t, S) = -S \Phi\left( d_{1} \right) + e^{-r T}K \Phi\left(-d_{2} \right)
+					V_{\text{put}}(t, S) = -S \Phi\left( -d_{1} \right) + e^{-r T}K \Phi\left(-d_{2} \right)
 					\]
 					with \(d_{1}\) and \(d_{2}\) as before.
 					<br /><br />
@@ -1696,7 +1708,7 @@
 					quantity.
 					The price of this type of option is therefore given by
 					\[
-					V_{\text{fly}} = V_{\text{call}}(K=K1) + V_{\text{call}}(K=K2) - 2V_{\text{call}}(K=K3).
+					V_{\text{fly}} = V_{\text{call}}(K=K_1) -2 V_{\text{call}}(K=K_2) + V_{\text{call}}(K=K_3).
 					\]
 					It is common for the third strike to be positioned between the other two strikes, and then the
 					holder is
@@ -1706,7 +1718,7 @@
 					bought and
 					a put option at another strike is sold
 					\[
-					V_{\text{rr}} = V_{\text{call}}(K=K1) - V_{\text{put}}(K=K2).
+					V_{\text{rr}} = V_{\text{call}}(K=K_1) - V_{\text{put}}(K=K_2).
 					\]
 					It is common to see the strikes taken in such a way that the premium from the sale of the put will
 					pay
@@ -1729,7 +1741,7 @@
 					underlying
 					changing parameters, similar to first-order Taylor series approximation,
 					\[
-					\Delta V(T, K, r, \sigma) = \frac{\partial V}{\partial T}\Delta T + \frac{\partial V}{\partial
+					\Delta V(S, T, K, r, \sigma) =  \frac{\partial V}{\partial S}\Delta S + \frac{\partial V}{\partial T}\Delta T + \frac{\partial V}{\partial
 					K}\Delta
 					K + \frac{\partial V}{\partial r}\Delta r + \frac{\partial V}{\partial \sigma}\Delta \sigma +
 					O(\Delta^{2}).
